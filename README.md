@@ -1,5 +1,5 @@
 # MarkovBot98
-Open-source and non-Facebook-connected version of [TextpostBot 98](https://www.facebook.com/TextpostBot-98-512340822260257/), an automated and crowd-fed Markov chain generating bot.
+Open-source and non-Facebook-connected version of [TextpostBot 98](https://www.facebook.com/TextpostBot-98-512340822260257/), an automated and crowd-fed Markov chain generating bot.  Given that it's being taught by the internet at large, its randomly-generated posts may not be entirely politically correct or safe for work/life.
 
 To be honest, this code is somewhat messy and wasn't written entirely for interactive usage, but I figured some fans of the page would be interested in having it, so here it is and thanks for the love!
 
