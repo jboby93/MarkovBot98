@@ -2,11 +2,12 @@ package com.jboby93.markovbot;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MarkovDB {
-	private Map<String, ArrayList<String>> _data;
+	private Map<String, List<String>> _data;
 
 	public int getDBSize() {
 		return _data.size();
@@ -23,7 +24,7 @@ public class MarkovDB {
 	}
 
 	public MarkovDB(int n) {
-		_data = new HashMap<String, ArrayList<String>>();
+		_data = new HashMap<String, List<String>>();
 		this.n = n;
 	}
 
@@ -57,7 +58,7 @@ public class MarkovDB {
 		}
 
 		//get the available options
-		ArrayList<String> options = _data.get(currentKey);
+		List<String> options = _data.get(currentKey);
 
 		//random bug?
 		if (options.size() == 0) {
@@ -93,7 +94,7 @@ public class MarkovDB {
 				key = key + " " + sanitize(words[i + j]);
 
 			//if there is already a value for this key in the map, get the current value, otherwise create an empty list
-			ArrayList<String> t = (_data.containsKey(key) ? _data.get(key) : new ArrayList<String>());
+			List<String> t = (_data.containsKey(key) ? _data.get(key) : new ArrayList<String>());
 
 			//add word (i+n+1) to this list. this is the word that comes after the phrase we generated above
 			t.add(sanitize(words[i + n]));
@@ -275,7 +276,7 @@ public class MarkovDB {
 		//generate the output to write to the file
 		ArrayList<String> out = new ArrayList<String>();
 		out.add("N=" + this.n);
-		for (Map.Entry<String, ArrayList<String>> pair : _data.entrySet()) {
+		for (Map.Entry<String, List<String>> pair : _data.entrySet()) {
 			String key = pair.getKey();
 			Object value_arr[] = pair.getValue().toArray();
 
@@ -302,12 +303,12 @@ public class MarkovDB {
 	} //end clear()
 
 	//editing methods
-	public ArrayList<DBSearchResult> search(ArrayList<String> terms) {
-		ArrayList<DBSearchResult> results = new ArrayList<DBSearchResult>();
+	public List<DBSearchResult> search(List<String> terms) {
+		List<DBSearchResult> results = new ArrayList<DBSearchResult>();
 
 		//find and add search result containers for each match, with scores (how many of the keywords does this result contain?)
 		int index = 0;
-		for (Map.Entry<String, ArrayList<String>> entry : _data.entrySet()) {
+		for (Map.Entry<String, List<String>> entry : _data.entrySet()) {
 			DBSearchResult thisResult = new DBSearchResult();
 			thisResult.key = entry.getKey();
 			thisResult.value = entry.getValue();
