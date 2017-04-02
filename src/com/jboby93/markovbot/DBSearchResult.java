@@ -3,9 +3,9 @@ package com.jboby93.markovbot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DBSearchResult {
-	private int index;
-	private int score;
+public class DBSearchResult implements Comparable<DBSearchResult>{
+	private Integer index;
+	private Integer score;
 	private String key;
 	private List<String> value;
 	
@@ -46,5 +46,16 @@ public class DBSearchResult {
 
 	public void setValue(List<String> value) {
 		this.value = value;
+	}
+
+	//From what I gathered, you want to sort first by score, then by ID if the scores are the same 
+	@Override
+	public int compareTo(DBSearchResult other) {
+		int c = -(this.score.compareTo(other.getScore())); // Sort by descending score
+		if (c == 0){ // Same score, sort by index
+			return this.index.compareTo(other.getIndex());
+		} else {
+			return c;
+		}
 	}
 }

@@ -2,6 +2,8 @@ package com.jboby93.markovbot;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -308,27 +310,27 @@ public class MarkovDB {
 
 		//find and add search result containers for each match, with scores (how many of the keywords does this result contain?)
 		int index = 0;
-		for (Map.Entry<String, List<String>> entry : _data.entrySet()) {
+		for (String key : _data.keySet()) {
 			DBSearchResult thisResult = new DBSearchResult();
-			thisResult.setKey(entry.getKey());
-			thisResult.setValue(entry.getValue());
-			thisResult.setIndex(index);
+			thisResult.setKey(key);
+			thisResult.setValue(_data.get(key));
+			thisResult.setIndex(index++); // Index isn't used past here, increment now
 			
 			int score = thisResult.getScore();
-			for (String t : terms) {
-				//key matches +2
+			for (String term : terms) {
 				
-				if (entry.getKey().toLowerCase().contains(t.toLowerCase())) {
+				//key matches +2
+				if (key.toLowerCase().contains(term.toLowerCase())) {
 					score += 2;
 				}
 
 				//value (outcome) matches
-				for (String o : entry.getValue()) {
-					if (o.toLowerCase().equals(t)) {
+				for (String outcome : _data.get(key)) {
+					if (outcome.toLowerCase().equals(term)) {
 						score++;
-					} else if (o.toLowerCase().contains(t)) {
+					} else if (outcome.toLowerCase().contains(term)) {
 						//exclude single-letter search terms
-						if (t.length() > 1)
+						if (term.length() > 1)
 							score++;
 					}
 				}
@@ -339,15 +341,23 @@ public class MarkovDB {
 			if (score > 0) {
 				results.add(thisResult);
 			}
-
-			index++;
 		} //end for(each database entry)
 
-		//will already be sorted by ID since we're going in the order of the entry set of the data map
-		//so next, sort by score, starting from the end of the results. if it has a higher score than the one above it, move it
-		//	to the top of the results list
-		//
-
+		/*	will already be sorted by ID since we're going in the order of the entry set of the data map
+			so next, sort by score, starting from the end of the results. if it has a higher score than the one above it, move it
+			to the top of the results list
+		*/
+		
+		/*
+		 * Shouldn't rely on implementation-specific ordering of any data structure using hashing
+		 * Safer to manually order things at the end with a Comparator
+		 * 
+		 * DBSearchResult implements the Comparable interface, so instances can be determined
+		 * to be greater or less than each other for sorting purposes
+		 */
+		
+		Collections.sort(results);
+		
 		return results;
 	} //end search()
 
