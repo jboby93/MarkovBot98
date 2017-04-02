@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Scanner;
 import java.util.TimeZone;
 
@@ -113,7 +114,7 @@ public class App {
 
 								//results should be a listing, each n-gram has an ID which is its index in the database
 								//this ID is used to perform editing operations.
-								ArrayList<DBSearchResult> results = bot.getDB().search(terms);
+								List<DBSearchResult> results = bot.getDB().search(terms);
 								println(results.size() + " results found:");
 								for (DBSearchResult result : results) {
 									//[index] -- [key] -> [values]
