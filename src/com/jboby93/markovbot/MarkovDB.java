@@ -3,7 +3,6 @@ package com.jboby93.markovbot;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,7 @@ public class MarkovDB {
 			App.log("randomize(): error; data model size is 0");
 			currentKey = "null";
 		} else {
-			int start = App.rand(_data.entrySet().size() - 1);
+			int start = Tools.rand(_data.entrySet().size() - 1);
 			currentKey = (String) _data.keySet().toArray()[start];
 		}
 	} //end randomize()
@@ -73,7 +72,7 @@ public class MarkovDB {
 		}
 
 		//pick one randomly
-		String nextWord = options.get(App.rand(options.size() - 1));
+		String nextWord = options.get(Tools.rand(options.size() - 1));
 
 		try {
 			String newKey[] = currentKey.split(" ");
@@ -81,10 +80,10 @@ public class MarkovDB {
 				newKey[i] = newKey[i + 1];
 			}
 			newKey[newKey.length - 1] = nextWord;
-			currentKey = App.join(newKey, " ");
+			currentKey = Tools.join(newKey, " ");
 		} catch (ArrayIndexOutOfBoundsException e) {
 			//pick a random new one
-			currentKey = (String) _data.keySet().toArray()[App.rand(_data.entrySet().size() - 1)];
+			currentKey = (String) _data.keySet().toArray()[Tools.rand(_data.entrySet().size() - 1)];
 		}
 
 		return nextWord;

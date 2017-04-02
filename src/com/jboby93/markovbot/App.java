@@ -8,18 +8,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
-import java.util.TimeZone;
-
-import sun.management.VMManagement;
 
 public class App {
 	//==============================================
@@ -44,9 +35,7 @@ public class App {
 	private static String startTimeString = "null";
 	private static long startTime = -1;
 	
-	/**************************************************************************************************
-	 * LOGGING STUFF \
-	 **************************************************************************************************/
+	// Logging
 	private static String log_file = "[null]";
 	private static boolean logFileOpen = false;
 	private static PrintWriter log;
@@ -59,11 +48,11 @@ public class App {
 	// main()
 	//==============================================
 	public static void main(String args[]) {
-		startTimeString = getDateString();
-		startTime = getUNIXTimestamp();
+		startTimeString = Tools.getDateString();
+		startTime = Tools.getUNIXTimestamp();
 
 		about();
-		processID = getProcessID();
+		processID = Tools.getProcessID();
 
 		try {
 			openLogFile();
@@ -228,7 +217,7 @@ public class App {
 					} else {
 						switch (cmd[1]) {
 						case "time":
-							log("getUNIXTimestamp() returned " + getUNIXTimestamp());
+							log("getUNIXTimestamp() returned " + Tools.getUNIXTimestamp());
 							break;
 						default:
 							println("Invalid debug command");
@@ -294,7 +283,6 @@ public class App {
 					proceed = false;
 				} else {
 					//get word count
-					int tmp_size = bot.getDBSize();
 					println("generate: got " + bot.getDBSize() + " database entries from " + args[2]);
 					String fromFile_wordCount = readLine("How many words do you want? [#/[100]]: ");
 					try {
@@ -538,35 +526,26 @@ public class App {
 
 	public static void openLogFile() {
 		if (!logFileOpen) {
-			//make dir if it doesn't exist
-			//File logsDir = new File("../../logs"); //put in /cai/logs
-
-			//if(logsDir.exists() && logsDir.isDirectory()) {
-			//	//good
-			//} else {
-			//	logsDir.mkdir();
-			//}
-
-			String f = "stdout.txt";
+			String fileName = "stdout.txt";
 
 			//if the file exists, delete it so we can start clean
-			File check = new File(f);
+			File check = new File(fileName);
 			if (check.exists()) {
 				check.delete();
 			}
 
 			//String f = "../../logs/" + sessionID + "-" + getTimeStampForFileName() + ".log";
 			try {
-				log = new PrintWriter(new BufferedWriter(new FileWriter(f, true)));
-				log_file = f;
+				log = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
+				log_file = fileName;
 				logFileOpen = true;
 			} catch (IOException e) {
-				log("openLogFile(): IOException opening log file " + f + ":" + e.getMessage());
+				log("openLogFile(): IOException opening log file " + fileName + ":" + e.getMessage());
 			}
 		} else {
 			log("openLogFile(): a log file is already opened!");
 		}
-	} //end openLogFile()
+	}
 
 	public static void writeLogFile(String msg) {
 		if (logFileOpen) {
@@ -575,7 +554,7 @@ public class App {
 		} else {
 			//no log file is open!
 		}
-	} //end writeLogFile()
+	}
 
 	public static void closeLogFile() {
 		if (logFileOpen) {
@@ -584,11 +563,10 @@ public class App {
 			log("closeLogFile(): log file " + log_file + " closed");
 			log_file = "[null]";
 		}
-	} //end closeLogFile()
+	}
 
 	public static void log(String msg) {
 		log(msg, 0);
-		//System.out.println(getTimeStamp() + " " + msg);
 	}
 
 	public static void log(String msg, int level) {
@@ -605,13 +583,12 @@ public class App {
 			break;
 		}
 		if (log_level >= level) {
-			System.out.println(getTimeStamp() + l + msg);
+			System.out.println(Tools.getTimeStamp() + l + msg);
 
 		}
 		if (logFileOpen)
-			writeLogFile(getTimeStamp() + l + msg);
-		//if(iDebug) iPause();
-	} //end log()
+			writeLogFile(Tools.getTimeStamp() + l + msg);
+	}
 
 	public static void logStackTrace(Exception e) {
 		StringWriter stack = new StringWriter();
@@ -619,84 +596,5 @@ public class App {
 		log("[stack]: " + stack.toString());
 	}
 
-	public static String getTimeStamp() {
-		Calendar c = Calendar.getInstance();
-		return "["
-				+ (c.get(Calendar.HOUR_OF_DAY) < 10 ? "0" + c.get(Calendar.HOUR_OF_DAY) : c.get(Calendar.HOUR_OF_DAY))
-						.toString()
-				+ ":" + (c.get(Calendar.MINUTE) < 10 ? "0" + c.get(Calendar.MINUTE) : c.get(Calendar.MINUTE)).toString()
-				+ ":" + (c.get(Calendar.SECOND) < 10 ? "0" + c.get(Calendar.SECOND) : c.get(Calendar.SECOND)).toString()
-				+ "]";
-	}
 
-	public static String getTimeStampForFileName() {
-		Calendar c = Calendar.getInstance();
-
-		return (c.get(Calendar.HOUR_OF_DAY) < 10 ? "0" + c.get(Calendar.HOUR_OF_DAY) : c.get(Calendar.HOUR_OF_DAY))
-				.toString()
-				+ (c.get(Calendar.MINUTE) < 10 ? "0" + c.get(Calendar.MINUTE) : c.get(Calendar.MINUTE)).toString()
-				+ (c.get(Calendar.SECOND) < 10 ? "0" + c.get(Calendar.SECOND) : c.get(Calendar.SECOND)).toString();
-	}
-
-	public static long getUNIXTimestamp() {
-		return Calendar.getInstance().getTimeInMillis() / 1000;
-	}
-
-	public static String getDateString() {
-		Calendar c = Calendar.getInstance();
-
-		String[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September",
-				"October", "November", "December" };
-
-		return months[c.get(Calendar.MONTH)] + " " + c.get(Calendar.DAY_OF_MONTH) + ", " + c.get(Calendar.YEAR) + " "
-				+ c.get(Calendar.HOUR) + ":"
-				+ (c.get(Calendar.MINUTE) < 10 ? "0" + c.get(Calendar.MINUTE) : c.get(Calendar.MINUTE)).toString()
-				+ (c.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm") + " " + TimeZone.getDefault()
-						.getDisplayName(TimeZone.getDefault().inDaylightTime(new Date()), TimeZone.SHORT);
-	}
-
-	//==============================================
-	// Utility functions
-	//==============================================
-	//random number generator -- range: [0, max)
-	public static int rand(int max) {
-		return (int) (Math.random() * max);
-	}
-
-	//string join function as in PHP
-	public static String join(String r[], String d) {
-		String out = "";
-		for (int i = 0; i < r.length; i++){
-			out += r[i];
-			if (i != r.length-1){
-				out += d;
-			}
-		}
-		return out;
-	}
-
-	private static String getProcessID() {
-		Integer pid = -1;
-
-		/*
-		 * When Java 9 is alpha, this whole process will be doable in one line:
-		 * long pid = ProcessHandle.current().getPid();
-		 * As opposed to using hacky reflection
-		 */
-		try {
-			RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
-			Field jvm = runtime.getClass().getDeclaredField("jvm");
-			jvm.setAccessible(true);
-			VMManagement mgmt = (VMManagement) jvm.get(runtime);
-			Method pid_method = mgmt.getClass().getDeclaredMethod("getProcessId");
-			pid_method.setAccessible(true);
-
-			pid = (Integer) pid_method.invoke(mgmt);
-		} catch (Exception e) {
-			log("getProcessID(): exception occurred: " + e.getMessage());
-			pid = -1;
-		}
-
-		return pid.toString();
-	}
 }
