@@ -1,9 +1,6 @@
 package com.jboby93.markovbot;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
 
 public class MarkovBot {
 	private MarkovDB _db;
