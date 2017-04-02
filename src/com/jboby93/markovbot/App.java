@@ -664,26 +664,26 @@ public class App {
 	}
 
 	//string join function as in PHP
-	// (http://stackoverflow.com/questions/1515437/java-function-for-arrays-like-phps-join)
 	public static String join(String r[], String d) {
-		if (r.length == 0)
-			return "";
-		StringBuilder sb = new StringBuilder();
-		int i;
-		for (i = 0; i < r.length - 1; i++)
-			sb.append(r[i] + d);
-		return sb.toString() + r[i];
+		String out = "";
+		for (int i = 0; i < r.length; i++){
+			out += r[i];
+			if (i != r.length-1){
+				out += d;
+			}
+		}
+		return out;
 	}
 
 	private static String getProcessID() {
 		Integer pid = -1;
 
+		/*
+		 * When Java 9 is alpha, this whole process will be doable in one line:
+		 * long pid = ProcessHandle.current().getPid();
+		 * As opposed to using hacky reflection
+		 */
 		try {
-			/*
-			 * When Java 9 is alpha, this whole process will be doable in one line:
-			 * long pid = ProcessHandle.current().getPid();
-			 * As opposed to using hacky reflection
-			 */
 			RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
 			Field jvm = runtime.getClass().getDeclaredField("jvm");
 			jvm.setAccessible(true);
@@ -698,5 +698,5 @@ public class App {
 		}
 
 		return pid.toString();
-	} //end getProcessID()
-} //end class App
+	}
+}
