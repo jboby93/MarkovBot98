@@ -37,7 +37,7 @@ public class App {
 		return bot.getStatus();
 	}
 
-	public static void main(String args[]) {
+	public static void main(String args[]) throws IOException{
 		startTimeString = Tools.getDateString();
 		startTime = Tools.getUNIXTimestamp();
 		reader = new BufferedReader(new InputStreamReader(System.in));
@@ -242,7 +242,7 @@ public class App {
 		closeLogFile();
 	} 
 
-	public static void generatePost(String args[]) {
+	public static void generatePost(String args[]) throws IOException {
 		//arg: (optional) word count
 		int wordCount = 100;
 		boolean fromFile = false;
@@ -288,15 +288,18 @@ public class App {
 				}
 			} else {
 				System.out.println("generate: invalid argument; expected word count or \"from [filename]\"");
-				String in_wordCount = readLine("How many words do you want? [#]: ");
-				try {
+				System.out.println("How many words do you want? [#]: ");
+				System.out.flush();
+				
+				String in_wordCount = reader.readLine();
+				if (in_wordCount.matches("\\d+")){ // Only digits in our string again
 					wordCount = Integer.parseInt(in_wordCount);
-				} catch (Exception e) {
+				} else { // Other shit in there
 					System.out.println("using default value of 100");
 					wordCount = 100;
 				}
 			}
-		} //end if (arguments check)
+		}
 
 		if (proceed && bot.getDBSize() > 0) {
 			System.out.println("generating " + wordCount + " words of shit, hang on...");
@@ -309,7 +312,10 @@ public class App {
 			System.out.println("=======================================");
 			System.out.println("What do you want to do with this text?");
 			System.out.println(" save - save to file; anything else - nothing");
-			String ask = readLine("[save/[*]]: ");
+			System.out.println("save/[*]]: ");
+			System.out.flush();
+			
+			String ask = reader.readLine().toLowerCase();
 			switch (ask.toLowerCase()) {
 			case "save":
 				saveLastResultToFile();
@@ -334,7 +340,13 @@ public class App {
 	public static void learnFromFile(String args[]) {
 		String file = "";
 		if (args.length == 1) {
-			file = readLine("Learn from file [or #cancel to cancel]: ");
+			System.out.println("Learn from file [or #cancel to cancel]: ");
+			System.out.flush();
+			try {
+				file = reader.readLine();
+			} catch (IOException e) {
+				logStackTrace(e);
+			}
 		} else {
 			file = args[1];
 		}
@@ -343,7 +355,7 @@ public class App {
 			bot.learnFromFile(file);
 			System.out.println("Done.");
 		}
-	} //end learnFromFile()
+	} 
 
 	public static void learnFromConsole(String args[]) {
 		String input = "";
@@ -355,7 +367,11 @@ public class App {
 		System.out.println("The bot will be fed line by line.  Type #cancel to finish.");
 		System.out.println("==========================================================");
 		while (!done) {
-			input = readLine();
+			try {
+				input = reader.readLine();
+			} catch (IOException e) {
+				logStackTrace(e);
+			}
 
 			if (input.equals(cancel)) {
 				done = true;
@@ -367,11 +383,19 @@ public class App {
 		int after = bot.getDBSize();
 
 		System.out.println("Added " + (after - before) + " new entries to the bot's database");
-	} //end learnFromConsole()
+	} 
 
 	public static void saveLastResultToFile() {
 		System.out.println("Enter a filename or '#cancel' to cancel.");
-		String file = readLine("save as: ");
+		System.out.println("save as: ");
+		System.out.flush();
+		
+		String file = "";
+		try {
+			file = reader.readLine();
+		} catch (IOException e1) {
+			logStackTrace(e1);
+		}
 		if (file.equals("#cancel")) {
 			System.out.println("Operation cancelled.");
 		} else {
@@ -382,7 +406,7 @@ public class App {
 				logStackTrace(e);
 			}
 		}
-	} //end saveLastResultToFile()
+	}
 
 	//on process crash, halt all threads
 	private static void panic(Exception e) {
@@ -392,22 +416,16 @@ public class App {
 	}
 
 	public static String readFile(String file) throws IOException {
-		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-			String line = null;
-			StringBuilder sb = new StringBuilder();
-			String ls = System.getProperty("line.separator");
-
-			while ((line = reader.readLine()) != null) {
-				sb.append(line);
-				sb.append(ls);
-			}
-
-			reader.close();
-			return sb.toString();
-		} catch (IOException e) {
-			throw e;
+		BufferedReader fileReader = new BufferedReader(new FileReader(file));
+		
+		String out = "";
+		String line = null;
+		while ((line = fileReader.readLine()) != null){
+			out += line;
 		}
-	} //end readFile()
+		fileReader.close();
+		return out;
+	}
 
 	public static boolean confirm(String prompt) {
 		System.out.println(prompt+" [y/n]");
