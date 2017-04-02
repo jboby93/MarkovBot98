@@ -9,8 +9,17 @@ import java.util.List;
 import java.util.Map;
 
 public class MarkovDB {
+	public static final String NO_ENTRY_FOR_CURRENT_KEY = "NO_ENTRY_FOR_CURRENT_KEY";
+	
+	private static final String keyvalue_sep = "#KV_SEP#";
+	private static final String choice_sep = "#SEP#";
+	
 	private Map<String, List<String>> _data;
+	private String currentKey = "null";
+	private boolean modified = false;
+	private String filename = "null";
 
+	
 	public int getDBSize() {
 		return _data.size();
 	}
@@ -30,8 +39,6 @@ public class MarkovDB {
 		this.n = n;
 	}
 
-	private String currentKey = "null";
-
 	public String getCurrentKey() {
 		return currentKey;
 	}
@@ -47,8 +54,6 @@ public class MarkovDB {
 			currentKey = (String) _data.keySet().toArray()[start];
 		}
 	} //end randomize()
-
-	public static final String NO_ENTRY_FOR_CURRENT_KEY = "NO_ENTRY_FOR_CURRENT_KEY";
 
 	public String getNextWord() {
 		//generate random word from current n-gram
@@ -113,13 +118,9 @@ public class MarkovDB {
 		return word.toLowerCase().trim();
 	}
 
-	private boolean modified = false;
-
 	public boolean isModified() {
 		return modified;
 	}
-
-	private String filename = "null";
 
 	public String getFilename() {
 		return filename;
@@ -184,9 +185,6 @@ public class MarkovDB {
 			App.logStackTrace(e);
 		} //end try
 	}
-
-	private static final String keyvalue_sep = "#KV_SEP#";
-	private static final String choice_sep = "#SEP#";
 
 	private void readFromFile(String file, boolean append) throws IOException {
 		//read the database from the file
@@ -382,7 +380,6 @@ public class MarkovDB {
 
 	public void remove(int at) {
 		_data.remove(getKeyForIndex(at));
-
 		this.modified = true;
 	}
 } //end class MarkovDB

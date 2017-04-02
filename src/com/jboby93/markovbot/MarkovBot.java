@@ -3,6 +3,9 @@ package com.jboby93.markovbot;
 import java.io.IOException;
 
 public class MarkovBot {
+	public static final String GENERATE_ERROR_NODATA = "#GENERATE_ERROR_NODATA#";
+	
+	private Exception lastException = null;
 	private MarkovDB _db;
 
 	public MarkovBot() {
@@ -58,8 +61,6 @@ public class MarkovBot {
 			return r;
 		} //end if (is there anything in the data model?)
 	} //end generate()
-
-	public static final String GENERATE_ERROR_NODATA = "#GENERATE_ERROR_NODATA#";
 
 	public void learnFrom(String input) {
 		_db.teach(input);
@@ -122,8 +123,6 @@ public class MarkovBot {
 	public MarkovDB getDB() {
 		return _db;
 	}
-
-	private Exception lastException = null;
 
 	public Exception getLastException() {
 		return this.lastException;

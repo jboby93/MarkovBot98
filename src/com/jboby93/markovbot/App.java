@@ -23,24 +23,31 @@ public class App {
 	public static final String author = "jboby93";
 	public static final String version = "0.7";
 	public static final String build_date = "5/10/2016";
-	private static final int log_level = 0;
 	public static final String NL = System.getProperty("line.separator");
 
+	private static final int log_level = 0;
 	//process ID
 	private static String processID = "null";
 
 	//the bot to use
 	private static MarkovBot bot;
 
-	public static String getStatus() {
-		return bot.getStatus();
-	}
-
 	//the last generated result
 	private static String lastResult = "null";
 
 	private static String startTimeString = "null";
 	private static long startTime = -1;
+	
+	/**************************************************************************************************
+	 * LOGGING STUFF \
+	 **************************************************************************************************/
+	private static String log_file = "[null]";
+	private static boolean logFileOpen = false;
+	private static PrintWriter log;
+	
+	public static String getStatus() {
+		return bot.getStatus();
+	}
 
 	//==============================================
 	// main()
@@ -522,13 +529,6 @@ public class App {
 			throw e;
 		}
 	}
-
-	/**************************************************************************************************
-	 * LOGGING STUFF \
-	 **************************************************************************************************/
-	private static String log_file = "[null]";
-	private static boolean logFileOpen = false;
-	private static PrintWriter log;
 
 	public static void openLogFile() {
 		if (!logFileOpen) {
