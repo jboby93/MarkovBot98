@@ -49,17 +49,17 @@ public class App {
 			log("main(): creating bot instance");
 			bot = new MarkovBot();
 
-			println("[This is the open-source and non-Facebook-connected version of TextpostBot 98.]");
-			println("Like the page on FB if you want to see what happens when a crowdsourced Markov");
-			println("chain generator is given shitposting powers!");
-			println("");
+			System.out.println("[This is the open-source and non-Facebook-connected version of TextpostBot 98.]");
+			System.out.println("Like the page on FB if you want to see what happens when a crowdsourced Markov");
+			System.out.println("chain generator is given shitposting powers!");
+			System.out.println("");
 
-			println("Welcome to " + name + " - type 'help' for commands");
+			System.out.println("Welcome to " + name + " - type 'help' for commands");
 			boolean quit = false;
 			do {
 				String in = readLine("[" + getStatus() + "] > ");
 				String cmd[] = in.split(" ");
-				//println("");
+				//System.out.println("");
 
 				switch (cmd[0]) {
 				case "generate": //generate
@@ -68,12 +68,12 @@ public class App {
 					break;
 				case "last": //bring back the last generated output
 				case "L":
-					println("");
-					println("This is the last generated result:");
-					println(lastResult);
-					println("=======================================");
-					println("What do you want to do with this text?");
-					println(" save - save to file; anything else - nothing");
+					System.out.println("");
+					System.out.println("This is the last generated result:");
+					System.out.println(lastResult);
+					System.out.println("=======================================");
+					System.out.println("What do you want to do with this text?");
+					System.out.println(" save - save to file; anything else - nothing");
 					String ask = readLine("[save/[*]]: ");
 					switch (ask.toLowerCase()) {
 					case "save":
@@ -105,15 +105,15 @@ public class App {
 								//results should be a listing, each n-gram has an ID which is its index in the database
 								//this ID is used to perform editing operations.
 								List<DBSearchResult> results = bot.getDB().search(terms);
-								println(results.size() + " results found:");
+								System.out.println(results.size() + " results found:");
 								for (DBSearchResult result : results) {
 									//[index] -- [key] -> [values]
-									println(result.getIndex() + " [match score " + result.getScore() + "] -- '" + result.getKey()
+									System.out.println(result.getIndex() + " [match score " + result.getScore() + "] -- '" + result.getKey()
 											+ "' -> " + result.getValue().toString());
 								}
 							} else {
 								//missing argument(s): search term(s)
-								println("expected: search term(s)");
+								System.out.println("expected: search term(s)");
 							}
 							break;
 						case "edit":
@@ -125,7 +125,7 @@ public class App {
 
 							} else {
 								//missing argument - n-gram index
-								println("expected: n-gram index. use 'search' to find an n-gram's index");
+								System.out.println("expected: n-gram index. use 'search' to find an n-gram's index");
 							}
 							break;
 						case "remove":
@@ -135,7 +135,7 @@ public class App {
 								bot.getDB().remove(Integer.parseInt(cmd[2]));
 							} else {
 								//missing argument - n-gram index
-								println("expected: n-gram index. use 'search' to find an n-gram's index");
+								System.out.println("expected: n-gram index. use 'search' to find an n-gram's index");
 							}
 							break;
 						case "replace":
@@ -151,25 +151,25 @@ public class App {
 							}
 							break;
 						case "help":
-							println("usage: db [sub-command]");
-							println("file i/o:");
-							println(" - load - Loads a database from a file. (can also use command macro 'dbl')");
-							println(" - save - Saves a database to a file. (can also use command macro 'dbs')");
-							println("database operations:");
-							println(" - search [terms]");
-							println("   Searches the database for n-grams containing or leading to the search terms.");
-							println("   Each result is given an n-gram index that describes its location in the database.  You'll need to supply this ID to use the edit or remove commands on a particular n-gram.");
-							println(" - edit [n-gram index]");
-							println("   Allows editing of the outcomes of the n-gram at the specified index within the database, including creation and deletion.");
-							println(" - remove [n-gram index]");
-							println("   Removes an n-gram and all of its associated outcomes from the database.  This can impact generation results.");
-							println(" - clear - Clears all data from the database.");
+							System.out.println("usage: db [sub-command]");
+							System.out.println("file i/o:");
+							System.out.println(" - load - Loads a database from a file. (can also use command macro 'dbl')");
+							System.out.println(" - save - Saves a database to a file. (can also use command macro 'dbs')");
+							System.out.println("database operations:");
+							System.out.println(" - search [terms]");
+							System.out.println("   Searches the database for n-grams containing or leading to the search terms.");
+							System.out.println("   Each result is given an n-gram index that describes its location in the database.  You'll need to supply this ID to use the edit or remove commands on a particular n-gram.");
+							System.out.println(" - edit [n-gram index]");
+							System.out.println("   Allows editing of the outcomes of the n-gram at the specified index within the database, including creation and deletion.");
+							System.out.println(" - remove [n-gram index]");
+							System.out.println("   Removes an n-gram and all of its associated outcomes from the database.  This can impact generation results.");
+							System.out.println(" - clear - Clears all data from the database.");
 							break;
 						}
 					} else {
 						//missing argument: db
 						//print list of subcommands
-						println("db: missing argument - expected load, save, search, edit, remove, clear, or help");
+						System.out.println("db: missing argument - expected load, save, search, edit, remove, clear, or help");
 					}
 					break;
 				case "dbl": //load database
@@ -201,30 +201,30 @@ public class App {
 				case "debug":
 					if (cmd.length == 1) {
 						//missing arg
-						println("expected debug command");
+						System.out.println("expected debug command");
 					} else {
 						switch (cmd[1]) {
 						case "time":
 							log("getUNIXTimestamp() returned " + Tools.getUNIXTimestamp());
 							break;
 						default:
-							println("Invalid debug command");
+							System.out.println("Invalid debug command");
 						}
 					}
 					break;
 				case "help":
-					println("Available commands:");
-					println(" generate, g - generate a shitpost");
-					println("               add \"from [file]\" to use a file as input text");
-					println("          db - database commands");
-					println("         dbl - load database");
-					println("         dbs - save database");
-					println("     read, r - read and learn from file");
-					println("    teach, t - teach the bot from stdin");
-					println("     quit, q - quit");
+					System.out.println("Available commands:");
+					System.out.println(" generate, g - generate a shitpost");
+					System.out.println("               add \"from [file]\" to use a file as input text");
+					System.out.println("          db - database commands");
+					System.out.println("         dbl - load database");
+					System.out.println("         dbs - save database");
+					System.out.println("     read, r - read and learn from file");
+					System.out.println("    teach, t - teach the bot from stdin");
+					System.out.println("     quit, q - quit");
 					break;
 				default:
-					println("unrecognized command: " + in.split(" ")[0]);
+					System.out.println("unrecognized command: " + in.split(" ")[0]);
 					break;
 				}
 			} while (!quit);
@@ -271,38 +271,38 @@ public class App {
 					proceed = false;
 				} else {
 					//get word count
-					println("generate: got " + bot.getDBSize() + " database entries from " + args[2]);
+					System.out.println("generate: got " + bot.getDBSize() + " database entries from " + args[2]);
 					String fromFile_wordCount = readLine("How many words do you want? [#/[100]]: ");
 					try {
 						wordCount = Integer.parseInt(fromFile_wordCount);
 					} catch (Exception e) {
-						println("using default value of 100");
+						System.out.println("using default value of 100");
 						wordCount = 100;
 					}
 				}
 			} else {
-				println("generate: invalid argument; expected word count or \"from [filename]\"");
+				System.out.println("generate: invalid argument; expected word count or \"from [filename]\"");
 				String in_wordCount = readLine("How many words do you want? [#]: ");
 				try {
 					wordCount = Integer.parseInt(in_wordCount);
 				} catch (Exception e) {
-					println("using default value of 100");
+					System.out.println("using default value of 100");
 					wordCount = 100;
 				}
 			}
 		} //end if (arguments check)
 
 		if (proceed && bot.getDBSize() > 0) {
-			println("generating " + wordCount + " words of shit, hang on...");
-			println("");
+			System.out.println("generating " + wordCount + " words of shit, hang on...");
+			System.out.println("");
 
 			String result = bot.generate(wordCount); //default: 100
 			lastResult = result;
 
-			println(result);
-			println("=======================================");
-			println("What do you want to do with this text?");
-			println(" save - save to file; anything else - nothing");
+			System.out.println(result);
+			System.out.println("=======================================");
+			System.out.println("What do you want to do with this text?");
+			System.out.println(" save - save to file; anything else - nothing");
 			String ask = readLine("[save/[*]]: ");
 			switch (ask.toLowerCase()) {
 			case "save":
@@ -322,7 +322,7 @@ public class App {
 			bot.replaceDatabase("tmp.botdb");
 		}
 
-		println("Done.");
+		System.out.println("Done.");
 	} //end generatePost()
 
 	public static void learnFromFile(String args[]) {
@@ -335,7 +335,7 @@ public class App {
 
 		if (!file.equals("#cancel")) {
 			bot.learnFromFile(file);
-			println("Done.");
+			System.out.println("Done.");
 		}
 	} //end learnFromFile()
 
@@ -346,8 +346,8 @@ public class App {
 
 		int before = bot.getDBSize();
 
-		println("The bot will be fed line by line.  Type #cancel to finish.");
-		println("==========================================================");
+		System.out.println("The bot will be fed line by line.  Type #cancel to finish.");
+		System.out.println("==========================================================");
 		while (!done) {
 			input = readLine();
 
@@ -360,18 +360,18 @@ public class App {
 
 		int after = bot.getDBSize();
 
-		println("Added " + (after - before) + " new entries to the bot's database");
+		System.out.println("Added " + (after - before) + " new entries to the bot's database");
 	} //end learnFromConsole()
 
 	public static void saveLastResultToFile() {
-		println("Enter a filename or '#cancel' to cancel.");
+		System.out.println("Enter a filename or '#cancel' to cancel.");
 		String file = readLine("save as: ");
 		if (file.equals("#cancel")) {
-			println("Operation cancelled.");
+			System.out.println("Operation cancelled.");
 		} else {
 			try {
 				writeFile(file, lastResult);
-				println("File saved successfully!");
+				System.out.println("File saved successfully!");
 			} catch (IOException e) {
 				logStackTrace(e);
 			}
@@ -383,23 +383,6 @@ public class App {
 		log("panic(): panic handler invoked on exception -- the program will stop");
 		logStackTrace(e);
 		//hopefully from here the process can then end
-	}
-
-	//==============================================
-	// usual I/O functions
-	//==============================================
-	public static void print(String s) {
-		System.out.print(s);
-	}
-
-	public static void println(String s) {
-		System.out.println(s);
-	}
-
-	public static void printStackTrace(Exception e) {
-		StringWriter stack = new StringWriter();
-		e.printStackTrace(new PrintWriter(stack));
-		println("[stack]: " + stack.toString());
 	}
 
 	public static String readFile(String file) throws IOException {
@@ -449,9 +432,9 @@ public class App {
 	}
 
 	public static void about() {
-		println(name + " - v" + version + " (" + build_date + ")");
-		//println("developer: " + author);
-		println("");
+		System.out.println(name + " - v" + version + " (" + build_date + ")");
+		//System.out.println("developer: " + author);
+		System.out.println("");
 	}
 
 	public static String Left(String str, int length) {
