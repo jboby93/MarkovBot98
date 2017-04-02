@@ -20,24 +20,24 @@ public class App {
 	public static final String NL = System.getProperty("line.separator");
 
 	private static final int log_level = 0;
-	private static String processID = "null"; 		// Process ID
-	private static MarkovBot bot; 					// The bot to use
-	private static String lastResult = "null"; 		// Last generated result
+	private static String processID = "null"; // Process ID
+	private static MarkovBot bot; // The bot to use
+	private static String lastResult = "null"; // Last generated result
 	private static String startTimeString = "null";
 	private static long startTime = -1;
-	
+
 	// Logging
-	private static String log_file = "[null]"; 		// Log file name
+	private static String log_file = "[null]"; // Log file name
 	private static boolean logFileOpen = false;
-	private static PrintWriter log; 				// The log itself
-	
-	private static BufferedReader reader;			// BufferedReader is more efficient than scanner
-	
+	private static PrintWriter log; // The log itself
+
+	private static BufferedReader reader; // BufferedReader is more efficient than scanner
+
 	public static String getStatus() {
 		return bot.getStatus();
 	}
 
-	public static void main(String args[]) throws IOException{
+	public static void main(String args[]) throws IOException {
 		startTimeString = Tools.getDateString();
 		startTime = Tools.getUNIXTimestamp();
 		reader = new BufferedReader(new InputStreamReader(System.in));
@@ -60,7 +60,7 @@ public class App {
 			System.out.println("Welcome to " + name + " - type 'help' for commands");
 			boolean quit = false;
 			do {
-				System.out.println("["+getStatus()+"] > ");
+				System.out.println("[" + getStatus() + "] > ");
 				System.out.flush();
 				String[] cmd = reader.readLine().split(" "); // Do it all in one line
 
@@ -80,7 +80,7 @@ public class App {
 					System.out.println("[save/[*]]: ");
 					System.out.flush();
 					String ask = reader.readLine().toLowerCase();
-					
+
 					switch (ask) {
 					case "save":
 						saveLastResultToFile();
@@ -114,8 +114,8 @@ public class App {
 								System.out.println(results.size() + " results found:");
 								for (DBSearchResult result : results) {
 									//[index] -- [key] -> [values]
-									System.out.println(result.getIndex() + " [match score " + result.getScore() + "] -- '" + result.getKey()
-											+ "' -> " + result.getValue().toString());
+									System.out.println(result.getIndex() + " [match score " + result.getScore()
+											+ "] -- '" + result.getKey() + "' -> " + result.getValue().toString());
 								}
 							} else {
 								//missing argument(s): search term(s)
@@ -159,23 +159,30 @@ public class App {
 						case "help":
 							System.out.println("usage: db [sub-command]");
 							System.out.println("file i/o:");
-							System.out.println(" - load - Loads a database from a file. (can also use command macro 'dbl')");
-							System.out.println(" - save - Saves a database to a file. (can also use command macro 'dbs')");
+							System.out.println(
+									" - load - Loads a database from a file. (can also use command macro 'dbl')");
+							System.out.println(
+									" - save - Saves a database to a file. (can also use command macro 'dbs')");
 							System.out.println("database operations:");
 							System.out.println(" - search [terms]");
-							System.out.println("   Searches the database for n-grams containing or leading to the search terms.");
-							System.out.println("   Each result is given an n-gram index that describes its location in the database.  You'll need to supply this ID to use the edit or remove commands on a particular n-gram.");
+							System.out.println(
+									"   Searches the database for n-grams containing or leading to the search terms.");
+							System.out.println(
+									"   Each result is given an n-gram index that describes its location in the database.  You'll need to supply this ID to use the edit or remove commands on a particular n-gram.");
 							System.out.println(" - edit [n-gram index]");
-							System.out.println("   Allows editing of the outcomes of the n-gram at the specified index within the database, including creation and deletion.");
+							System.out.println(
+									"   Allows editing of the outcomes of the n-gram at the specified index within the database, including creation and deletion.");
 							System.out.println(" - remove [n-gram index]");
-							System.out.println("   Removes an n-gram and all of its associated outcomes from the database.  This can impact generation results.");
+							System.out.println(
+									"   Removes an n-gram and all of its associated outcomes from the database.  This can impact generation results.");
 							System.out.println(" - clear - Clears all data from the database.");
 							break;
 						}
 					} else {
 						//missing argument: db
 						//print list of subcommands
-						System.out.println("db: missing argument - expected load, save, search, edit, remove, clear, or help");
+						System.out.println(
+								"db: missing argument - expected load, save, search, edit, remove, clear, or help");
 					}
 					break;
 				case "dbl": //load database
@@ -240,7 +247,7 @@ public class App {
 
 		log("main(): exiting");
 		closeLogFile();
-	} 
+	}
 
 	public static void generatePost(String args[]) throws IOException {
 		//arg: (optional) word count
@@ -248,7 +255,7 @@ public class App {
 		boolean fromFile = false;
 
 		if (args.length > 1) {
-			if (args[1].matches("\\d+")){ // Only contains digits
+			if (args[1].matches("\\d+")) { // Only contains digits
 				wordCount = Integer.parseInt(args[1]);
 			} else { // Has other shit in it, won't parse in base 10
 				fromFile = args[1].equals("from") && (args.length > 2);
@@ -277,9 +284,9 @@ public class App {
 					System.out.println("generate: got " + bot.getDBSize() + " database entries from " + args[2]);
 					System.out.println("How many words do you want? [#/[100]]: ");
 					System.out.flush();
-					
+
 					String fromFile_wordCount = reader.readLine();
-					if (fromFile_wordCount.matches("\\d+")){ // Only digits
+					if (fromFile_wordCount.matches("\\d+")) { // Only digits
 						wordCount = Integer.parseInt(fromFile_wordCount);
 					} else { // Other shit than digits again
 						System.out.println("using default value of 100");
@@ -290,9 +297,9 @@ public class App {
 				System.out.println("generate: invalid argument; expected word count or \"from [filename]\"");
 				System.out.println("How many words do you want? [#]: ");
 				System.out.flush();
-				
+
 				String in_wordCount = reader.readLine();
-				if (in_wordCount.matches("\\d+")){ // Only digits in our string again
+				if (in_wordCount.matches("\\d+")) { // Only digits in our string again
 					wordCount = Integer.parseInt(in_wordCount);
 				} else { // Other shit in there
 					System.out.println("using default value of 100");
@@ -314,7 +321,7 @@ public class App {
 			System.out.println(" save - save to file; anything else - nothing");
 			System.out.println("save/[*]]: ");
 			System.out.flush();
-			
+
 			String ask = reader.readLine().toLowerCase();
 			switch (ask.toLowerCase()) {
 			case "save":
@@ -355,7 +362,7 @@ public class App {
 			bot.learnFromFile(file);
 			System.out.println("Done.");
 		}
-	} 
+	}
 
 	public static void learnFromConsole(String args[]) {
 		String input = "";
@@ -383,13 +390,13 @@ public class App {
 		int after = bot.getDBSize();
 
 		System.out.println("Added " + (after - before) + " new entries to the bot's database");
-	} 
+	}
 
 	public static void saveLastResultToFile() {
 		System.out.println("Enter a filename or '#cancel' to cancel.");
 		System.out.println("save as: ");
 		System.out.flush();
-		
+
 		String file = "";
 		try {
 			file = reader.readLine();
@@ -413,10 +420,10 @@ public class App {
 
 	public static String readFile(String file) throws IOException {
 		BufferedReader fileReader = new BufferedReader(new FileReader(file));
-		
+
 		String out = "";
 		String line = null;
-		while ((line = fileReader.readLine()) != null){
+		while ((line = fileReader.readLine()) != null) {
 			out += line;
 		}
 		fileReader.close();
@@ -424,7 +431,7 @@ public class App {
 	}
 
 	public static boolean confirm(String prompt) {
-		System.out.println(prompt+" [y/n]");
+		System.out.println(prompt + " [y/n]");
 		System.out.flush();
 		String response = "";
 		try {
@@ -444,10 +451,10 @@ public class App {
 		try {
 			fileWriter = new BufferedWriter(new FileWriter(file, append));
 		} catch (IOException e) {
-			log("Could not find file: "+file);
+			log("Could not find file: " + file);
 			logStackTrace(e);
 		}
-		
+
 		try {
 			fileWriter.write(text);
 			fileWriter.close(); // Close calls flush
