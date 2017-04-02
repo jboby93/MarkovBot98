@@ -8,12 +8,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.TimeZone;
+
+import sun.management.VMManagement;
 
 public class App {
 	//==============================================
@@ -671,22 +677,19 @@ public class App {
 
 	private static String getProcessID() {
 		Integer pid = -1;
-		String r = "(n/a)";
 
 		try {
-			java.lang.management.RuntimeMXBean runtime = java.lang.management.ManagementFactory.getRuntimeMXBean();
-			java.lang.reflect.Field jvm = runtime.getClass().getDeclaredField("jvm");
+			RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
+			Field jvm = runtime.getClass().getDeclaredField("jvm");
 			jvm.setAccessible(true);
-			sun.management.VMManagement mgmt = (sun.management.VMManagement) jvm.get(runtime);
-			java.lang.reflect.Method pid_method = mgmt.getClass().getDeclaredMethod("getProcessId");
+			VMManagement mgmt = (VMManagement) jvm.get(runtime);
+			Method pid_method = mgmt.getClass().getDeclaredMethod("getProcessId");
 			pid_method.setAccessible(true);
 
 			pid = (Integer) pid_method.invoke(mgmt);
-			r = pid.toString();
 		} catch (Exception e) {
 			log("getProcessID(): exception occurred: " + e.getMessage());
 			pid = -1;
-			r = "(n/a)";
 		}
 
 		return pid.toString();
