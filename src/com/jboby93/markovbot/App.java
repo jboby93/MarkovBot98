@@ -6,11 +6,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class App {
 	public static final String name = "MarkovBot 98";
@@ -31,6 +31,8 @@ public class App {
 	private static boolean logFileOpen = false;
 	private static PrintWriter log; 				// The log itself
 	
+	private static BufferedReader reader;			// BufferedReader is more efficient than scanner
+	
 	public static String getStatus() {
 		return bot.getStatus();
 	}
@@ -38,6 +40,7 @@ public class App {
 	public static void main(String args[]) {
 		startTimeString = Tools.getDateString();
 		startTime = Tools.getUNIXTimestamp();
+		reader = new BufferedReader(new InputStreamReader(System.in));
 
 		about();
 		processID = Tools.getProcessID();
@@ -57,9 +60,9 @@ public class App {
 			System.out.println("Welcome to " + name + " - type 'help' for commands");
 			boolean quit = false;
 			do {
-				String in = readLine("[" + getStatus() + "] > ");
-				String cmd[] = in.split(" ");
-				//System.out.println("");
+				System.out.println("["+getStatus()+"] > ");
+				System.out.flush();
+				String[] cmd = reader.readLine().split(" "); // Do it all in one line
 
 				switch (cmd[0]) {
 				case "generate": //generate
@@ -74,8 +77,11 @@ public class App {
 					System.out.println("=======================================");
 					System.out.println("What do you want to do with this text?");
 					System.out.println(" save - save to file; anything else - nothing");
-					String ask = readLine("[save/[*]]: ");
-					switch (ask.toLowerCase()) {
+					System.out.println("[save/[*]]: ");
+					System.out.flush();
+					String ask = reader.readLine().toLowerCase();
+					
+					switch (ask) {
 					case "save":
 						saveLastResultToFile();
 						break;
@@ -97,7 +103,7 @@ public class App {
 							if (cmd.length > 2) {
 								//return n-grams the terms appear in, and also list the n-grams that
 								//lead to the search terms
-								ArrayList<String> terms = new ArrayList<String>();
+								List<String> terms = new ArrayList<String>();
 								for (int t = 2; t < cmd.length; t++) {
 									terms.add(cmd[t].trim().toLowerCase());
 								}
@@ -224,7 +230,7 @@ public class App {
 					System.out.println("     quit, q - quit");
 					break;
 				default:
-					System.out.println("unrecognized command: " + in.split(" ")[0]);
+					System.out.println("unrecognized command: " + cmd[0]);
 					break;
 				}
 			} while (!quit);
@@ -234,20 +240,17 @@ public class App {
 
 		log("main(): exiting");
 		closeLogFile();
-	} //end main()	
+	} 
 
-	//==============================================
-	// commands (args[0] = the command itself)
-	//==============================================
 	public static void generatePost(String args[]) {
 		//arg: (optional) word count
 		int wordCount = 100;
 		boolean fromFile = false;
 
 		if (args.length > 1) {
-			try {
+			if (args[1].matches("\\d+")){ // Only contains digits
 				wordCount = Integer.parseInt(args[1]);
-			} catch (Exception e) {
+			} else { // Has other shit in it, won't parse in base 10
 				fromFile = args[1].equals("from") && (args.length > 2);
 				wordCount = -1;
 			}
@@ -272,10 +275,13 @@ public class App {
 				} else {
 					//get word count
 					System.out.println("generate: got " + bot.getDBSize() + " database entries from " + args[2]);
-					String fromFile_wordCount = readLine("How many words do you want? [#/[100]]: ");
-					try {
+					System.out.println("How many words do you want? [#/[100]]: ");
+					System.out.flush();
+					
+					String fromFile_wordCount = reader.readLine();
+					if (fromFile_wordCount.matches("\\d+")){ // Only digits
 						wordCount = Integer.parseInt(fromFile_wordCount);
-					} catch (Exception e) {
+					} else { // Other shit than digits again
 						System.out.println("using default value of 100");
 						wordCount = 100;
 					}
@@ -403,32 +409,11 @@ public class App {
 		}
 	} //end readFile()
 
-	public static String readLine(String prompt) {
-		return readLine(prompt, false);
-	}
-
-	public static String readLine(String prompt, boolean newlineAfterPrompt) {
-		System.out.print(prompt);
-		if (newlineAfterPrompt)
-			System.out.println("");
-
-		return readLine();
-	}
-
-	public static String readLine() {
-		try {
-			Scanner s = new Scanner(System.in);
-			String l = s.nextLine();
-			//s.close();
-			return l;
-		} catch (Exception e) {
-			return "readLine(): an exception occurred here? " + e.getMessage();
-		}
-	}
-
 	public static boolean confirm(String prompt) {
-		String response = readLine(prompt + " [y/N]: ");
-		return response.toLowerCase().contains("y");
+		System.out.println(prompt+" [y/n]");
+		System.out.flush();
+		String response = reader.readLine();
+		return (response.toLowerCase().charAt(0) == 'y');
 	}
 
 	public static void about() {
