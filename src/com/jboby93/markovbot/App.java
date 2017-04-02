@@ -679,6 +679,11 @@ public class App {
 		Integer pid = -1;
 
 		try {
+			/*
+			 * When Java 9 is alpha, this whole process will be doable in one line:
+			 * long pid = ProcessHandle.current().getPid();
+			 * As opposed to using hacky reflection
+			 */
 			RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
 			Field jvm = runtime.getClass().getDeclaredField("jvm");
 			jvm.setAccessible(true);
