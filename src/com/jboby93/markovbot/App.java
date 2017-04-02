@@ -118,8 +118,8 @@ public class App {
 								println(results.size() + " results found:");
 								for (DBSearchResult result : results) {
 									//[index] -- [key] -> [values]
-									println(result.index + " [match score " + result.score + "] -- '" + result.key
-											+ "' -> " + result.value.toString());
+									println(result.getIndex() + " [match score " + result.getScore() + "] -- '" + result.getKey()
+											+ "' -> " + result.getValue().toString());
 								}
 							} else {
 								//missing argument(s): search term(s)

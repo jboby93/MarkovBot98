@@ -310,30 +310,33 @@ public class MarkovDB {
 		int index = 0;
 		for (Map.Entry<String, List<String>> entry : _data.entrySet()) {
 			DBSearchResult thisResult = new DBSearchResult();
-			thisResult.key = entry.getKey();
-			thisResult.value = entry.getValue();
-			thisResult.index = index;
-
+			thisResult.setKey(entry.getKey());
+			thisResult.setValue(entry.getValue());
+			thisResult.setIndex(index);
+			
+			int score = thisResult.getScore();
 			for (String t : terms) {
 				//key matches +2
+				
 				if (entry.getKey().toLowerCase().contains(t.toLowerCase())) {
-					thisResult.score += 2;
+					score += 2;
 				}
 
 				//value (outcome) matches
 				for (String o : entry.getValue()) {
 					if (o.toLowerCase().equals(t)) {
-						thisResult.score++;
+						score++;
 					} else if (o.toLowerCase().contains(t)) {
 						//exclude single-letter search terms
 						if (t.length() > 1)
-							thisResult.score++;
+							score++;
 					}
 				}
 			} //end for(each search term)
-
+			thisResult.setScore(score);
+			
 			//any hits?
-			if (thisResult.score > 0) {
+			if (score > 0) {
 				results.add(thisResult);
 			}
 
