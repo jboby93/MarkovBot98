@@ -399,12 +399,8 @@ public class App {
 		if (file.equals("#cancel")) {
 			System.out.println("Operation cancelled.");
 		} else {
-			try {
-				writeFile(file, lastResult);
-				System.out.println("File saved successfully!");
-			} catch (IOException e) {
-				logStackTrace(e);
-			}
+			writeFile(file, lastResult, false);
+			System.out.println("File saved successfully!");
 		}
 	}
 
@@ -430,71 +426,33 @@ public class App {
 	public static boolean confirm(String prompt) {
 		System.out.println(prompt+" [y/n]");
 		System.out.flush();
-		String response = reader.readLine();
+		String response = "";
+		try {
+			response = reader.readLine();
+		} catch (IOException e) {
+			logStackTrace(e);
+		}
 		return (response.toLowerCase().charAt(0) == 'y');
 	}
 
 	public static void about() {
-		System.out.println(name + " - v" + version + " (" + build_date + ")");
-		//System.out.println("developer: " + author);
-		System.out.println("");
+		System.out.println(name + " - v" + version + " (" + build_date + ")\n");
 	}
 
-	public static String Left(String str, int length) {
-		return str.substring(0, Math.min(length, str.length()));
-	}
-
-	public static void writeFile(String file, String text) throws IOException {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-			//write the text
-			bw.write(text);
-
-			bw.flush();
-			bw.close();
+	public static void writeFile(String file, String text, boolean append) {
+		BufferedWriter fileWriter = null;
+		try {
+			fileWriter = new BufferedWriter(new FileWriter(file, append));
 		} catch (IOException e) {
-			throw e;
+			log("Could not find file: "+file);
+			logStackTrace(e);
 		}
-	} //end writeFile()
-
-	public static void writeLines(String file, ArrayList<String> lines) throws IOException {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-			//write the text
-			for (String s : lines) {
-				bw.write(s);
-				bw.write("\n");
-			}
-
-			bw.flush();
-			bw.close();
-		} catch (IOException e) {
-			throw e;
-		}
-	} //end writeLines()
-
-	public static void appendToFile(String file, String text) throws IOException {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
-			//write the text
-			bw.write(text);
-
-			bw.flush();
-			bw.close();
-		} catch (IOException e) {
-			throw e;
-		}
-	}
-
-	public static void appendLinesToFile(String file, ArrayList<String> lines) throws IOException {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
-			//write the text
-			for (String s : lines) {
-				bw.write(s);
-				bw.newLine();
-			}
-
-			bw.flush();
-			bw.close();
-		} catch (IOException e) {
-			throw e;
+		
+		try {
+			fileWriter.write(text);
+			fileWriter.close(); // Close calls flush
+		} catch (IOException e1) {
+			logStackTrace(e1);
 		}
 	}
 
@@ -514,10 +472,10 @@ public class App {
 				log_file = fileName;
 				logFileOpen = true;
 			} catch (IOException e) {
-				log("openLogFile(): IOException opening log file " + fileName + ":" + e.getMessage());
+				log("IOException opening log file " + fileName + ":" + e.getMessage());
 			}
 		} else {
-			log("openLogFile(): a log file is already opened!");
+			log("A log file is already opened!");
 		}
 	}
 
@@ -569,6 +527,4 @@ public class App {
 		e.printStackTrace(new PrintWriter(stack));
 		log("[stack]: " + stack.toString());
 	}
-
-
 }
