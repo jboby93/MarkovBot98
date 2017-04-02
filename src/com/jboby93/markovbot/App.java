@@ -13,9 +13,6 @@ import java.util.List;
 import java.util.Scanner;
 
 public class App {
-	//==============================================
-	// the usual
-	//==============================================
 	public static final String name = "MarkovBot 98";
 	public static final String author = "jboby93";
 	public static final String version = "0.7";
@@ -23,30 +20,21 @@ public class App {
 	public static final String NL = System.getProperty("line.separator");
 
 	private static final int log_level = 0;
-	//process ID
-	private static String processID = "null";
-
-	//the bot to use
-	private static MarkovBot bot;
-
-	//the last generated result
-	private static String lastResult = "null";
-
+	private static String processID = "null"; 		// Process ID
+	private static MarkovBot bot; 					// The bot to use
+	private static String lastResult = "null"; 		// Last generated result
 	private static String startTimeString = "null";
 	private static long startTime = -1;
 	
 	// Logging
-	private static String log_file = "[null]";
+	private static String log_file = "[null]"; 		// Log file name
 	private static boolean logFileOpen = false;
-	private static PrintWriter log;
+	private static PrintWriter log; 				// The log itself
 	
 	public static String getStatus() {
 		return bot.getStatus();
 	}
 
-	//==============================================
-	// main()
-	//==============================================
 	public static void main(String args[]) {
 		startTimeString = Tools.getDateString();
 		startTime = Tools.getUNIXTimestamp();
