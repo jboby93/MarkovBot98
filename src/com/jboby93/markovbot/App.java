@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import db.DBSearchResult;
+import logging.Logger;
+
 public class App {
 	public static final String name = "MarkovBot 98";
 	public static final String author = "jboby93";

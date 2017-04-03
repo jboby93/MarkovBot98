@@ -1,4 +1,4 @@
-package com.jboby93.markovbot;
+package logging;
 
 public enum LogLevel {
 	VERBOSE, INFO, DEBUG, WARNING, ERROR

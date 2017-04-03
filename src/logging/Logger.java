@@ -1,9 +1,11 @@
-package com.jboby93.markovbot;
+package logging;
 
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
+import com.jboby93.markovbot.Tools;
 
 public class Logger {
 

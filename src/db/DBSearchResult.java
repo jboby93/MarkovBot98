@@ -1,4 +1,4 @@
-package com.jboby93.markovbot;
+package db;
 
 import java.util.ArrayList;
 import java.util.List;

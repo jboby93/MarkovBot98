@@ -2,15 +2,18 @@ package com.jboby93.markovbot;
 
 import java.io.IOException;
 
+import db.MarkovDB;
+import logging.Logger;
+
 public class MarkovBot {
 	public static final String GENERATE_ERROR_NODATA = "#GENERATE_ERROR_NODATA#";
 
-	private Exception lastException;
 	private MarkovDB _db;
+	private Exception lastException;
 
 	public MarkovBot() {
-		_db = new MarkovDB();
-		lastException = null;
+		this._db = new MarkovDB();
+		this.lastException = null;
 	}
 
 	public String generate() {
@@ -60,8 +63,8 @@ public class MarkovBot {
 			}
 
 			return r;
-		} //end if (is there anything in the data model?)
-	} //end generate()
+		}
+	}
 
 	public void learnFrom(String input) {
 		_db.teach(input);

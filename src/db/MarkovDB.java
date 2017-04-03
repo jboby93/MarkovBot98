@@ -1,4 +1,4 @@
-package com.jboby93.markovbot;
+package db;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -10,6 +10,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.jboby93.markovbot.App;
+import com.jboby93.markovbot.Tools;
+
+import logging.Logger;
 
 public class MarkovDB {
 	public static final String NO_ENTRY_FOR_CURRENT_KEY = "NO_ENTRY_FOR_CURRENT_KEY";
