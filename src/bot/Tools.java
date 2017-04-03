@@ -1,4 +1,4 @@
-package com.jboby93.markovbot;
+package bot;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;

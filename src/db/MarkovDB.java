@@ -11,9 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.jboby93.markovbot.App;
-import com.jboby93.markovbot.Tools;
-
+import bot.App;
+import bot.Tools;
 import logging.Logger;
 
 public class MarkovDB {
