@@ -16,6 +16,12 @@ public class App {
 	public static final String build_date = "5/10/2016";
 	public static final String NL = System.getProperty("line.separator");
 
+	/*
+	 * The @SuppressWarnings tags stop the compiler from complaining that some
+	 * variables are declared but not being used. I've made the assumption that
+	 * they are used in some component I haven't seen yet If they actually
+	 * aren't being used, you should consider removal
+	 */
 	@SuppressWarnings("unused")
 	private static String processID = null; // Process ID
 	private static MarkovBot bot; // The bot to use
