@@ -55,7 +55,8 @@ public class Logger {
 	}
 
 	private static void log(String msg, LogLevel level) {
-		String entry = DateTime.getTimeStamp() + level.toString() + msg;
+		DateTime dateTime = new DateTime();
+		String entry = dateTime.getTimeStamp() + level.toString() + msg;
 		if (logLevel.ordinal() >= level.ordinal()) {
 			System.out.println(entry);
 		}

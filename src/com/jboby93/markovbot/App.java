@@ -40,8 +40,9 @@ public class App {
 	}
 
 	public static void main(String args[]) throws IOException {
-		startTimeString = DateTime.getDateString();
-		startTime = DateTime.getUNIXTimestamp();
+		DateTime dateTime = new DateTime();
+		startTimeString = dateTime.getDateString();
+		startTime = dateTime.getUNIXTimestamp();
 		reader = new Scanner(System.in);
 
 		about();
@@ -220,7 +221,7 @@ public class App {
 					} else {
 						switch (cmd[1]) {
 						case "time":
-							Logger.debug("getUNIXTimestamp() returned " + DateTime.getUNIXTimestamp());
+							Logger.debug("getUNIXTimestamp() returned " + dateTime.getUNIXTimestamp());
 							break;
 						default:
 							System.out.println("Invalid debug command");
