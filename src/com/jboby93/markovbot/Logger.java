@@ -30,8 +30,8 @@ public class Logger {
 
 	public static void closeLogFile() {
 		if (log != null) {
-			log.close();
 			log("closeLogFile(): log file " + LOG_FILE_NAME + " closed");
+			log.close();
 			log = null;
 		}
 	}
