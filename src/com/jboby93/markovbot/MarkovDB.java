@@ -144,7 +144,7 @@ public class MarkovDB {
 			System.out.println("What do you want to do?");
 			System.out.println("1) Import to current database");
 			System.out.println("2) Close the current database and open a different one");
-			System.out.println("[1/2/[cancel]]: ");
+			System.out.print("[1/2/[cancel]]: ");
 			System.out.flush();
 			
 			String r = null;
@@ -168,7 +168,7 @@ public class MarkovDB {
 		if (!cancel) {
 			String file = null;
 			if (from == null){
-				System.out.println("Load from file [or '#cancel']: ");
+				System.out.print("Load from file [or '#cancel']: ");
 				System.out.flush();
 				try {
 					file = reader.readLine();
@@ -359,12 +359,7 @@ public class MarkovDB {
 			if (score > 0) {
 				results.add(thisResult);
 			}
-		} //end for(each database entry)
-
-		/*	will already be sorted by ID since we're going in the order of the entry set of the data map
-			so next, sort by score, starting from the end of the results. if it has a higher score than the one above it, move it
-			to the top of the results list
-		*/
+		}
 		
 		/*
 		 * Shouldn't rely on implementation-specific ordering of any data structure using hashing
@@ -377,7 +372,7 @@ public class MarkovDB {
 		Collections.sort(results);
 		
 		return results;
-	} //end search()
+	}
 
 	private String getKeyForIndex(int index) {
 		return (String) _data.keySet().toArray()[index];

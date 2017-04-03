@@ -68,7 +68,7 @@ public class App {
 			System.out.println("Welcome to " + name + " - type 'help' for commands");
 			boolean quit = false;
 			do {
-				System.out.println("[" + getStatus() + "] > ");
+				System.out.print("[" + getStatus() + "] > ");
 				System.out.flush();
 				String[] cmd = reader.readLine().split(" "); // Do it all in one line
 
@@ -85,7 +85,7 @@ public class App {
 					System.out.println("=======================================");
 					System.out.println("What do you want to do with this text?");
 					System.out.println(" save - save to file; anything else - nothing");
-					System.out.println("[save/[*]]: ");
+					System.out.print("[save/[*]]: ");
 					System.out.flush();
 					String ask = reader.readLine().toLowerCase();
 
@@ -290,7 +290,7 @@ public class App {
 				} else {
 					//get word count
 					System.out.println("generate: got " + bot.getDBSize() + " database entries from " + args[2]);
-					System.out.println("How many words do you want? [#/[100]]: ");
+					System.out.print("How many words do you want? [#/[100]]: ");
 					System.out.flush();
 
 					String fromFile_wordCount = reader.readLine();
@@ -303,7 +303,7 @@ public class App {
 				}
 			} else {
 				System.out.println("generate: invalid argument; expected word count or \"from [filename]\"");
-				System.out.println("How many words do you want? [#]: ");
+				System.out.print("How many words do you want? [#]: ");
 				System.out.flush();
 
 				String in_wordCount = reader.readLine();
@@ -327,7 +327,7 @@ public class App {
 			System.out.println("=======================================");
 			System.out.println("What do you want to do with this text?");
 			System.out.println(" save - save to file; anything else - nothing");
-			System.out.println("save/[*]]: ");
+			System.out.print("save/[*]]: ");
 			System.out.flush();
 
 			String ask = reader.readLine().toLowerCase();
@@ -355,7 +355,7 @@ public class App {
 	public static void learnFromFile(String args[]) {
 		String file = "";
 		if (args.length == 1) {
-			System.out.println("Learn from file [or #cancel to cancel]: ");
+			System.out.print("Learn from file [or #cancel to cancel]: ");
 			System.out.flush();
 			try {
 				file = reader.readLine();
@@ -402,7 +402,7 @@ public class App {
 
 	public static void saveLastResultToFile() {
 		System.out.println("Enter a filename or '#cancel' to cancel.");
-		System.out.println("save as: ");
+		System.out.print("Save as: ");
 		System.out.flush();
 
 		String file = "";
@@ -439,7 +439,7 @@ public class App {
 	}
 
 	public static boolean confirm(String prompt) {
-		System.out.println(prompt + " [y/n]");
+		System.out.print(prompt + " [y/n]");
 		System.out.flush();
 		String response = "";
 		try {
