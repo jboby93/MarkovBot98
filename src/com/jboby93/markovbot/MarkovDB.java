@@ -18,31 +18,30 @@ public class MarkovDB {
 	private static final String choice_sep = "#SEP#";
 	
 	private Map<String, List<String>> _data;
-	private String currentKey = "null";
-	private boolean modified = false;
-	private String filename = "null";
-	
 	private BufferedReader reader;
-
+	private String currentKey;
+	private boolean modified;
+	private String filename;
+	private int n;
 	
 	public int getDBSize() {
 		return _data.size();
 	}
 
-	private int n = 2;
-
 	public int getN() {
 		return n;
 	}
 
-	public MarkovDB() {
-		this(2);
-		reader = new BufferedReader(new InputStreamReader(System.in));
-	}
-
-	public MarkovDB(int n) {
+	// A variable parameter constructor, can basically treat int... as int[],
+	// But it lets you call the constructor like:
+	// MarkovDB() or MarkovDB(2) or MarkovDB(1, 2, 3, 4)
+	public MarkovDB(int... n) {
 		_data = new HashMap<String, List<String>>();
-		this.n = n;
+		this.n = (n.length == 0) ? 2 : n[0];
+		this.currentKey = "null";
+		this.modified = false;
+		this.filename = "null";
+		this.reader = new BufferedReader(new InputStreamReader(System.in));
 	}
 
 	public String getCurrentKey() {
