@@ -5,9 +5,9 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class App {
 	public static final String name = "MarkovBot 98";
@@ -30,7 +30,7 @@ public class App {
 	@SuppressWarnings("unused")
 	private static long startTime = -1;
 
-	private static BufferedReader reader; // BufferedReader is more efficient than scanner
+	private static Scanner reader; // Scanner over BufferedReader, little I/O and less exception handling
 
 	public static String getStatus() {
 		return bot.getStatus();
@@ -39,7 +39,7 @@ public class App {
 	public static void main(String args[]) throws IOException {
 		startTimeString = Tools.getDateString();
 		startTime = Tools.getUNIXTimestamp();
-		reader = new BufferedReader(new InputStreamReader(System.in));
+		reader = new Scanner(System.in);
 
 		about();
 		processID = Tools.getProcessID();
@@ -61,7 +61,7 @@ public class App {
 			do {
 				System.out.print("[" + getStatus() + "] > ");
 				System.out.flush();
-				String[] cmd = reader.readLine().split(" "); // Do it all in one line
+				String[] cmd = reader.nextLine().split(" "); // Do it all in one line
 
 				switch (cmd[0]) {
 				case "generate": //generate
@@ -78,7 +78,7 @@ public class App {
 					System.out.println(" save - save to file; anything else - nothing");
 					System.out.print("[save/[*]]: ");
 					System.out.flush();
-					String ask = reader.readLine().toLowerCase();
+					String ask = reader.nextLine().toLowerCase();
 
 					switch (ask) {
 					case "save":
@@ -284,7 +284,7 @@ public class App {
 					System.out.print("How many words do you want? [#/[100]]: ");
 					System.out.flush();
 
-					String fromFile_wordCount = reader.readLine();
+					String fromFile_wordCount = reader.nextLine();
 					if (fromFile_wordCount.matches("\\d+")) { // Only digits
 						wordCount = Integer.parseInt(fromFile_wordCount);
 					} else { // Other shit than digits again
@@ -297,7 +297,7 @@ public class App {
 				System.out.print("How many words do you want? [#]: ");
 				System.out.flush();
 
-				String in_wordCount = reader.readLine();
+				String in_wordCount = reader.nextLine();
 				if (in_wordCount.matches("\\d+")) { // Only digits in our string again
 					wordCount = Integer.parseInt(in_wordCount);
 				} else { // Other shit in there
@@ -321,7 +321,7 @@ public class App {
 			System.out.print("save/[*]]: ");
 			System.out.flush();
 
-			String ask = reader.readLine().toLowerCase();
+			String ask = reader.nextLine().toLowerCase();
 			switch (ask) {
 			case "save":
 				saveLastResultToFile();
@@ -344,15 +344,11 @@ public class App {
 	} //end generatePost()
 
 	public static void learnFromFile(String args[]) {
-		String file = "";
+		String file = null;
 		if (args.length == 1) {
 			System.out.print("Learn from file [or #cancel to cancel]: ");
 			System.out.flush();
-			try {
-				file = reader.readLine();
-			} catch (IOException e) {
-				Logger.logStackTrace(e);
-			}
+			file = reader.nextLine();
 		} else {
 			file = args[1];
 		}
@@ -364,7 +360,7 @@ public class App {
 	}
 
 	public static void learnFromConsole(String args[]) {
-		String input = "";
+
 		String cancel = "#cancel";
 		boolean done = false;
 
@@ -372,13 +368,11 @@ public class App {
 
 		System.out.println("The bot will be fed line by line.  Type #cancel to finish.");
 		System.out.println("==========================================================");
-		while (!done) {
-			try {
-				input = reader.readLine();
-			} catch (IOException e) {
-				Logger.logStackTrace(e);
-			}
+		System.out.flush();
 
+		String input = null;
+		while (!done) {
+			input = reader.nextLine();
 			if (input.equals(cancel)) {
 				done = true;
 			} else {
@@ -387,7 +381,6 @@ public class App {
 		}
 
 		int after = bot.getDBSize();
-
 		System.out.println("Added " + (after - before) + " new entries to the bot's database");
 	}
 
@@ -396,12 +389,8 @@ public class App {
 		System.out.print("Save as: ");
 		System.out.flush();
 
-		String file = "";
-		try {
-			file = reader.readLine();
-		} catch (IOException e1) {
-			Logger.logStackTrace(e1);
-		}
+		String file = reader.nextLine();
+
 		if (file.equals("#cancel")) {
 			System.out.println("Operation cancelled.");
 		} else {
@@ -414,7 +403,6 @@ public class App {
 	private static void panic(Exception e) {
 		Logger.error("panic(): panic handler invoked on exception -- the program will stop");
 		Logger.logStackTrace(e);
-		//hopefully from here the process can then end
 	}
 
 	public static String readFile(String file) throws IOException {
@@ -432,12 +420,7 @@ public class App {
 	public static boolean confirm(String prompt) {
 		System.out.print(prompt + " [y/n]");
 		System.out.flush();
-		String response = "";
-		try {
-			response = reader.readLine();
-		} catch (IOException e) {
-			Logger.logStackTrace(e);
-		}
+		String response = reader.nextLine();
 		return (response.toLowerCase().charAt(0) == 'y');
 	}
 

@@ -18,7 +18,7 @@ public class MarkovDB {
 	private static final String choice_sep = "#SEP#";
 
 	private Map<String, List<String>> _data;
-	private BufferedReader reader;
+	private BufferedReader reader; // Lots of line reading, this is more efficient than Scanner
 	private String currentKey;
 	private boolean modified;
 	private String filename;
