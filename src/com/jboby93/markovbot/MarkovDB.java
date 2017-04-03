@@ -62,7 +62,6 @@ public class MarkovDB {
 
 	public String getNextWord() {
 		//generate random word from current n-gram
-
 		//does the current n-gram exist?
 		if (!_data.containsKey(currentKey)) {
 			//nope, so randomize? or return null?
@@ -93,11 +92,11 @@ public class MarkovDB {
 		}
 
 		return nextWord;
-	} //end getNextWord()
+	}
 
 	public void teach(String source) {
-		//remove double-spaces and newlines, replacing with single-spaces
-		String words[] = source.replace("  ", " ").replace("\n", " ").replace("\t", " ").split(" "); // (3-31: also remove tab characters)
+		// Replace all whitespace (newline, tab, space, etc) with single spaces then split
+		String[] words = source.replaceAll("\\s+", " ").split(" "); 
 
 		for (int i = 0; i < words.length - n - 1; i++) {
 			//form a string consisting of words in range i -> (i+n-1)
