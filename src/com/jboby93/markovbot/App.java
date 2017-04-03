@@ -5,97 +5,87 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.TimeZone;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Scanner;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.io.RandomAccessFile;
-import java.nio.file.Paths;
-import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
+
+import db.DBSearchResult;
+import logging.Logger;
+import time.DateTime;
 
 public class App {
-	//==============================================
-	// the usual
-	//==============================================
 	public static final String name = "MarkovBot 98";
 	public static final String author = "jboby93";
 	public static final String version = "0.7";
 	public static final String build_date = "5/10/2016";
-	private static final int log_level = 0;
 	public static final String NL = System.getProperty("line.separator");
-	
-	//process ID
-	private static String processID = "null";
 
-	//the bot to use
-	private static MarkovBot bot;
+	/*
+	 * The @SuppressWarnings tags stop the compiler from complaining that some
+	 * variables are declared but not being used. I've made the assumption that
+	 * they are used in some component I haven't seen yet If they actually
+	 * aren't being used, you should consider removal
+	 */
+	@SuppressWarnings("unused")
+	private static String processID = null; // Process ID
+	private static MarkovBot bot; // The bot to use
+	private static String lastResult = null; // Last generated result
+	private static String startTimeString = null;
+	@SuppressWarnings("unused")
+	private static long startTime = -1;
+
+	private static Scanner reader; // Scanner over BufferedReader, little I/O and less exception handling
+
 	public static String getStatus() {
 		return bot.getStatus();
 	}
 
-	//the last generated result
-	private static String lastResult = "null";
-	
-	private static String startTimeString = "null";
-	private static long startTime = -1;
-	//==============================================
-	// main()
-	//==============================================
-	public static void main(String args[]) {
-		startTimeString = getDateString();
-		startTime = getUNIXTimestamp();
+	public static void main(String args[]) throws IOException {
+		DateTime dateTime = new DateTime();
+		startTimeString = dateTime.getDateString();
+		startTime = dateTime.getUNIXTimestamp();
+		reader = new Scanner(System.in);
 
 		about();
-		processID = getProcessID();
+		processID = Tools.getProcessID();
 
 		try {
-			openLogFile();
-			log(name + " - v" + version + " (" + build_date + ")");
-			log("main(): program started on " + startTimeString);
-			log("main(): creating bot instance");
+			Logger.openLogFile();
+			Logger.info(name + " - v" + version + " (" + build_date + ")");
+			Logger.debug("main(): program started on " + startTimeString);
+			Logger.debug("main(): creating bot instance");
 			bot = new MarkovBot();
-			
-			println("[This is the open-source and non-Facebook-connected version of TextpostBot 98.]");
-			println("Like the page on FB if you want to see what happens when a crowdsourced Markov");
-			println("chain generator is given shitposting powers!");
-			println("");
 
-			println("Welcome to " + name + " - type 'help' for commands");
+			System.out.println("[This is the open-source and non-Facebook-connected version of TextpostBot 98.]");
+			System.out.println("Like the page on FB if you want to see what happens when a crowdsourced Markov");
+			System.out.println("chain generator is given shitposting powers!");
+			System.out.println("");
+
+			System.out.println("Welcome to " + name + " - type 'help' for commands");
 			boolean quit = false;
 			do {
-				String in = readLine("[" + getStatus() + "] > ");
-				String cmd[] = in.split(" ");
-				//println("");
-				
-				switch(cmd[0]) {
+				System.out.print("[" + getStatus() + "] > ");
+				System.out.flush();
+				String[] cmd = reader.nextLine().split(" "); // Do it all in one line
+
+				switch (cmd[0]) {
 				case "generate": //generate
 				case "g":
 					generatePost(cmd);
 					break;
 				case "last": //bring back the last generated output
 				case "L":
-					println("");
-					println("This is the last generated result:");
-					println(lastResult);
-					println("=======================================");
-					println("What do you want to do with this text?");
-					println(" save - save to file; anything else - nothing");
-					String ask = readLine("[save/[*]]: ");
-					switch(ask.toLowerCase()) {
+					System.out.println("");
+					System.out.println("This is the last generated result:");
+					System.out.println(lastResult);
+					System.out.println("=======================================");
+					System.out.println("What do you want to do with this text?");
+					System.out.println(" save - save to file; anything else - nothing");
+					System.out.print("[save/[*]]: ");
+					System.out.flush();
+					String ask = reader.nextLine().toLowerCase();
+
+					switch (ask) {
 					case "save":
 						saveLastResultToFile();
 						break;
@@ -103,8 +93,8 @@ public class App {
 					break;
 				case "db":
 					//get first argument
-					if(cmd.length > 1) {
-						switch(cmd[1]) {
+					if (cmd.length > 1) {
+						switch (cmd[1]) {
 						case "load":
 							bot.loadDatabase();
 							break;
@@ -114,25 +104,26 @@ public class App {
 						case "search":
 						case "s":
 							//remaining arguments: search terms
-							if(cmd.length > 2) {
+							if (cmd.length > 2) {
 								//return n-grams the terms appear in, and also list the n-grams that
 								//lead to the search terms
-								ArrayList<String> terms = new ArrayList<String>();
-								for(int t = 2; t < cmd.length; t++) {
+								List<String> terms = new ArrayList<String>();
+								for (int t = 2; t < cmd.length; t++) {
 									terms.add(cmd[t].trim().toLowerCase());
 								}
-								
+
 								//results should be a listing, each n-gram has an ID which is its index in the database
 								//this ID is used to perform editing operations.
-								ArrayList<DBSearchResult> results = bot.getDB().search(terms);
-								println(results.size() + " results found:");
-								for(DBSearchResult result : results) {
+								List<DBSearchResult> results = bot.getDB().search(terms);
+								System.out.println(results.size() + " results found:");
+								for (DBSearchResult result : results) {
 									//[index] -- [key] -> [values]
-									println(result.index + " [match score " + result.score + "] -- '" + result.key + "' -> " + result.value.toString());
+									System.out.println(result.getIndex() + " [match score " + result.getScore()
+											+ "] -- '" + result.getKey() + "' -> " + result.getValue().toString());
 								}
 							} else {
 								//missing argument(s): search term(s)
-								println("expected: search term(s)");
+								System.out.println("expected: search term(s)");
 							}
 							break;
 						case "edit":
@@ -140,21 +131,21 @@ public class App {
 							//argument: the index of the n-gram to edit
 							//looping menu: given the n-gram, list its possible outcomes
 							//get the number of an outcome to edit or delete, or add a new outcome, or cancel
-							if(cmd.length > 2) {
-								
+							if (cmd.length > 2) {
+
 							} else {
 								//missing argument - n-gram index
-								println("expected: n-gram index. use 'search' to find an n-gram's index");
+								System.out.println("expected: n-gram index. use 'search' to find an n-gram's index");
 							}
 							break;
 						case "remove":
 						case "rm":
 							//argument: the index of the n-gram to remove
-							if(cmd.length > 2) {
+							if (cmd.length > 2) {
 								bot.getDB().remove(Integer.parseInt(cmd[2]));
 							} else {
 								//missing argument - n-gram index
-								println("expected: n-gram index. use 'search' to find an n-gram's index");
+								System.out.println("expected: n-gram index. use 'search' to find an n-gram's index");
 							}
 							break;
 						case "replace":
@@ -163,43 +154,50 @@ public class App {
 							break;
 						case "clear":
 						case "C":
-							if(confirm("Are you sure you want to empty the database?")) {
-								if(confirm("Are you REALLY sure?")) {
+							if (confirm("Are you sure you want to empty the database?")) {
+								if (confirm("Are you REALLY sure?")) {
 									bot.getDB().clear();
 								}
 							}
 							break;
 						case "help":
-							println("usage: db [sub-command]");
-							println("file i/o:");
-							println(" - load - Loads a database from a file. (can also use command macro 'dbl')");
-							println(" - save - Saves a database to a file. (can also use command macro 'dbs')");
-							println("database operations:");
-							println(" - search [terms]");
-							println("   Searches the database for n-grams containing or leading to the search terms.");
-							println("   Each result is given an n-gram index that describes its location in the database.  You'll need to supply this ID to use the edit or remove commands on a particular n-gram.");
-							println(" - edit [n-gram index]");
-							println("   Allows editing of the outcomes of the n-gram at the specified index within the database, including creation and deletion.");
-							println(" - remove [n-gram index]");
-							println("   Removes an n-gram and all of its associated outcomes from the database.  This can impact generation results.");
-							println(" - clear - Clears all data from the database.");
+							System.out.println("usage: db [sub-command]");
+							System.out.println("file i/o:");
+							System.out.println(
+									" - load - Loads a database from a file. (can also use command macro 'dbl')");
+							System.out.println(
+									" - save - Saves a database to a file. (can also use command macro 'dbs')");
+							System.out.println("database operations:");
+							System.out.println(" - search [terms]");
+							System.out.println(
+									"   Searches the database for n-grams containing or leading to the search terms.");
+							System.out.println(
+									"   Each result is given an n-gram index that describes its location in the database.  You'll need to supply this ID to use the edit or remove commands on a particular n-gram.");
+							System.out.println(" - edit [n-gram index]");
+							System.out.println(
+									"   Allows editing of the outcomes of the n-gram at the specified index within the database, including creation and deletion.");
+							System.out.println(" - remove [n-gram index]");
+							System.out.println(
+									"   Removes an n-gram and all of its associated outcomes from the database.  This can impact generation results.");
+							System.out.println(" - clear - Clears all data from the database.");
 							break;
 						}
 					} else {
 						//missing argument: db
 						//print list of subcommands
-						println("db: missing argument - expected load, save, search, edit, remove, clear, or help");
+						System.out.println(
+								"db: missing argument - expected load, save, search, edit, remove, clear, or help");
 					}
 					break;
 				case "dbl": //load database
-					if(cmd.length > 1) {
+					if (cmd.length > 1) {
 						bot.loadDatabaseFrom(cmd[1]);
 					} else {
 						bot.loadDatabase();
 					}
 					break;
 				case "dbs": //save database
-					if(cmd.length > 1) {
+					if (cmd.length > 1) {
 						bot.saveDatabaseTo(cmd[1]);
 					} else {
 						bot.saveDatabase();
@@ -218,55 +216,52 @@ public class App {
 					quit = true;
 					break;
 				case "debug":
-					if(cmd.length == 1) {
+					if (cmd.length == 1) {
 						//missing arg
-						println("expected debug command");
+						System.out.println("expected debug command");
 					} else {
-						switch(cmd[1]) {
+						switch (cmd[1]) {
 						case "time":
-							log("getUNIXTimestamp() returned " + getUNIXTimestamp());
+							Logger.debug("getUNIXTimestamp() returned " + dateTime.getUNIXTimestamp());
 							break;
 						default:
-							println("Invalid debug command");
+							System.out.println("Invalid debug command");
 						}
 					}
 					break;
 				case "help":
-					println("Available commands:");
-					println(" generate, g - generate a shitpost");
-					println("               add \"from [file]\" to use a file as input text");
-					println("          db - database commands");
-					println("         dbl - load database");
-					println("         dbs - save database");
-					println("     read, r - read and learn from file");
-					println("    teach, t - teach the bot from stdin");
-					println("     quit, q - quit");
-					break; 
+					System.out.println("Available commands:");
+					System.out.println(" generate, g - generate a shitpost");
+					System.out.println("               add \"from [file]\" to use a file as input text");
+					System.out.println("          db - database commands");
+					System.out.println("         dbl - load database");
+					System.out.println("         dbs - save database");
+					System.out.println("     read, r - read and learn from file");
+					System.out.println("    teach, t - teach the bot from stdin");
+					System.out.println("     quit, q - quit");
+					break;
 				default:
-					println("unrecognized command: " + in.split(" ")[0]);
+					System.out.println("unrecognized command: " + cmd[0]);
 					break;
 				}
-			} while(!quit);
-		} catch(Exception e) {
+			} while (!quit);
+		} catch (Exception e) {
 			panic(e);
 		}
 
-		log("main(): exiting");
-		closeLogFile();
-	} //end main()	
-	
-	//==============================================
-	// commands (args[0] = the command itself)
-	//==============================================
-	public static void generatePost(String args[]) {
+		Logger.debug("main(): exiting");
+		Logger.closeLogFile();
+	}
+
+	public static void generatePost(String args[]) throws IOException {
 		//arg: (optional) word count
 		int wordCount = 100;
 		boolean fromFile = false;
 
-		if(args.length > 1) {
-			try {
+		if (args.length > 1) {
+			if (args[1].matches("\\d+")) { // Only contains digits
 				wordCount = Integer.parseInt(args[1]);
-			} catch(Exception e) {
+			} else { // Has other shit in it, won't parse in base 10
 				fromFile = args[1].equals("from") && (args.length > 2);
 				wordCount = -1;
 			}
@@ -276,394 +271,182 @@ public class App {
 		boolean usedTempDB = false;
 		boolean proceed = true;
 
-		if(wordCount == -1) {
-			if(fromFile) {
+		if (wordCount == -1) {
+			if (fromFile) {
 				//save current database to temp file
 				bot.saveDatabaseTo("tmp.botdb");
-				
+
 				//clear the current database
 				bot.clearDatabase();
-				
+
 				//open the file and feed it to the bot
-				if(bot.learnFromFile(args[2]) == -1) {
+				if (bot.learnFromFile(args[2]) == -1) {
 					//exception occured
 					proceed = false;
 				} else {
 					//get word count
-					int tmp_size = bot.getDBSize();
-					println("generate: got " + bot.getDBSize() + " database entries from " + args[2]);
-					String fromFile_wordCount = readLine("How many words do you want? [#/[100]]: ");
-					try {
+					System.out.println("generate: got " + bot.getDBSize() + " database entries from " + args[2]);
+					System.out.print("How many words do you want? [#/[100]]: ");
+					System.out.flush();
+
+					String fromFile_wordCount = reader.nextLine();
+					if (fromFile_wordCount.matches("\\d+")) { // Only digits
 						wordCount = Integer.parseInt(fromFile_wordCount);
-					} catch(Exception e) {
-						println("using default value of 100");
+					} else { // Other shit than digits again
+						System.out.println("using default value of 100");
 						wordCount = 100;
 					}
 				}
 			} else {
-				println("generate: invalid argument; expected word count or \"from [filename]\"");
-				String in_wordCount = readLine("How many words do you want? [#]: ");
-				try {
+				System.out.println("generate: invalid argument; expected word count or \"from [filename]\"");
+				System.out.print("How many words do you want? [#]: ");
+				System.out.flush();
+
+				String in_wordCount = reader.nextLine();
+				if (in_wordCount.matches("\\d+")) { // Only digits in our string again
 					wordCount = Integer.parseInt(in_wordCount);
-				} catch(Exception e) {
-					println("using default value of 100");
+				} else { // Other shit in there
+					System.out.println("using default value of 100");
 					wordCount = 100;
 				}
 			}
-		} //end if (arguments check)
+		}
 
-		if(proceed && bot.getDBSize() > 0) {
-			println("generating " + wordCount + " words of shit, hang on...");
-			println("");
-			
+		if (proceed && bot.getDBSize() > 0) {
+			System.out.println("generating " + wordCount + " words of shit, hang on...");
+			System.out.println("");
+
 			String result = bot.generate(wordCount); //default: 100
 			lastResult = result;
-			
-			println(result);
-			println("=======================================");
-			println("What do you want to do with this text?");
-			println(" save - save to file; anything else - nothing");
-			String ask = readLine("[save/[*]]: ");
-			switch(ask.toLowerCase()) {
+
+			System.out.println(result);
+			System.out.println("=======================================");
+			System.out.println("What do you want to do with this text?");
+			System.out.println(" save - save to file; anything else - nothing");
+			System.out.print("save/[*]]: ");
+			System.out.flush();
+
+			String ask = reader.nextLine().toLowerCase();
+			switch (ask) {
 			case "save":
 				saveLastResultToFile();
 				break;
 			}
 		} else {
 			//canceled due to error or other reason
-			if(bot.getDBSize() == 0) {
-				log("generatePost(): can't generate shit; database is empty!");
+			if (bot.getDBSize() == 0) {
+				Logger.warning("generatePost(): can't generate shit; database is empty!");
 			}
 		}
-		
 
-		if(usedTempDB) {
+		if (usedTempDB) {
 			//restore the temp database
 			bot.clearDatabase();
 			bot.replaceDatabase("tmp.botdb");
 		}
 
-		println("Done.");
+		System.out.println("Done.");
 	} //end generatePost()
-	
+
 	public static void learnFromFile(String args[]) {
-		String file = "";
-		if(args.length == 1) {
-			file = readLine("Learn from file [or #cancel to cancel]: ");
-		} else { 
+		String file = null;
+		if (args.length == 1) {
+			System.out.print("Learn from file [or #cancel to cancel]: ");
+			System.out.flush();
+			file = reader.nextLine();
+		} else {
 			file = args[1];
 		}
-		
-		if(!file.equals("#cancel")) {
+
+		if (!file.equals("#cancel")) {
 			bot.learnFromFile(file);
-			println("Done.");
+			System.out.println("Done.");
 		}
-	} //end learnFromFile()
-	
+	}
+
 	public static void learnFromConsole(String args[]) {
-		String input = "";
+
 		String cancel = "#cancel";
 		boolean done = false;
-		
+
 		int before = bot.getDBSize();
-		
-		println("The bot will be fed line by line.  Type #cancel to finish.");
-		println("==========================================================");
-		while(!done) {
-			input = readLine();
-			
-			if(input.equals(cancel)) { done = true; } else {
+
+		System.out.println("The bot will be fed line by line.  Type #cancel to finish.");
+		System.out.println("==========================================================");
+		System.out.flush();
+
+		String input = null;
+		while (!done) {
+			input = reader.nextLine();
+			if (input.equals(cancel)) {
+				done = true;
+			} else {
 				bot.learnFrom(input);
 			}
 		}
-		
+
 		int after = bot.getDBSize();
-		
-		println("Added " + (after - before) + " new entries to the bot's database");
-	} //end learnFromConsole()
-	
+		System.out.println("Added " + (after - before) + " new entries to the bot's database");
+	}
+
 	public static void saveLastResultToFile() {
-		println("Enter a filename or '#cancel' to cancel.");
-		String file = readLine("save as: ");
-		if(file.equals("#cancel")) {
-			println("Operation cancelled.");
+		System.out.println("Enter a filename or '#cancel' to cancel.");
+		System.out.print("Save as: ");
+		System.out.flush();
+
+		String file = reader.nextLine();
+
+		if (file.equals("#cancel")) {
+			System.out.println("Operation cancelled.");
 		} else {
-			try {
-				writeFile(file, lastResult);
-				println("File saved successfully!");
-			} catch(IOException e) {
-				logStackTrace(e);
-			}
+			writeFile(file, lastResult, false);
+			System.out.println("File saved successfully!");
 		}
-	} //end saveLastResultToFile()
+	}
 
 	//on process crash, halt all threads
 	private static void panic(Exception e) {
-		log("panic(): panic handler invoked on exception -- the program will stop");
-		logStackTrace(e);
-		//hopefully from here the process can then end
+		Logger.error("panic(): panic handler invoked on exception -- the program will stop");
+		Logger.logStackTrace(e);
 	}
 
-	//==============================================
-	// usual I/O functions
-	//==============================================
-	public static void print(String s) { System.out.print(s); }
-	public static void println(String s) { System.out.println(s); }
-	public static void printStackTrace(Exception e) {
-		StringWriter stack = new StringWriter();
-		e.printStackTrace(new PrintWriter(stack));
-		println("[stack]: " + stack.toString());
-	}
 	public static String readFile(String file) throws IOException {
-		try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
-			String line = null;
-			StringBuilder sb = new StringBuilder();
-			String ls = System.getProperty("line.separator");
+		BufferedReader fileReader = new BufferedReader(new FileReader(file));
 
-			while((line = reader.readLine()) != null) {
-				sb.append(line);
-				sb.append(ls);
-			}
-			
-			reader.close();
-			return sb.toString();
-		} catch(IOException e) {
-			throw e;
+		String out = "";
+		String line = null;
+		while ((line = fileReader.readLine()) != null) {
+			out += line + App.NL;
 		}
-	} //end readFile()
-	public static String readLine(String prompt) { return readLine(prompt, false); }
-	public static String readLine(String prompt, boolean newlineAfterPrompt) {
-		System.out.print(prompt);
-		if(newlineAfterPrompt) System.out.println("");
-		
-		return readLine();
+		fileReader.close();
+		return out;
 	}
-	public static String readLine() {
-		try {
-			Scanner s = new Scanner(System.in);
-			String l = s.nextLine();
-			//s.close();
-			return l;
-		} catch(Exception e) {
-			return "readLine(): an exception occurred here? " + e.getMessage();
-		}
-	}
+
 	public static boolean confirm(String prompt) {
-		String response = readLine(prompt + " [y/N]: ");
-		return response.toLowerCase().contains("y");
+		System.out.print(prompt + " [y/n]");
+		System.out.flush();
+		String response = reader.nextLine();
+		return (response.toLowerCase().charAt(0) == 'y');
 	}
-	
+
 	public static void about() {
-		println(name + " - v" + version + " (" + build_date + ")");
-		//println("developer: " + author);
-		println("");
+		System.out.println(name + " - v" + version + " (" + build_date + ")\n");
 	}
 
-	public static String Left(String str, int length) {
-		return str.substring(0, Math.min(length, str.length()));
-	}
-	public static void writeFile(String file, String text) throws IOException {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-			//write the text
-			bw.write(text);
-
-			bw.flush();
-			bw.close();
-		} catch(IOException e) {
-			throw e;
-		}
-	} //end writeFile()
-
-	public static void writeLines(String file, ArrayList<String> lines) throws IOException {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-			//write the text
-			for(String s : lines) {
-				bw.write(s);
-				bw.write("\n");
-			}
-
-			bw.flush();
-			bw.close();
-		} catch(IOException e) {
-			throw e;
-		}
-	} //end writeLines()
-
-	public static void appendToFile(String file, String text) throws IOException {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
-			//write the text
-			bw.write(text);
-
-			bw.flush();
-			bw.close();
-		} catch(IOException e) {
-			throw e;
-		}
-	}
-	
-	public static void appendLinesToFile(String file, ArrayList<String> lines) throws IOException {
-		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
-			//write the text
-			for(String s : lines) {
-				bw.write(s);
-				bw.newLine();
-			}
-
-			bw.flush();
-			bw.close();
-		} catch(IOException e) {
-			throw e;
-		}
-	}
-
-	/**************************************************************************************************
-	 * LOGGING STUFF
-	\**************************************************************************************************/
-	private static String log_file = "[null]";
-	private static boolean logFileOpen = false;
-	private static PrintWriter log;
-	public static void openLogFile() {
-		if(!logFileOpen) {
-			//make dir if it doesn't exist
-			//File logsDir = new File("../../logs"); //put in /cai/logs
-			
-			//if(logsDir.exists() && logsDir.isDirectory()) {
-			//	//good
-			//} else {
-			//	logsDir.mkdir();
-			//}
-			
-			String f = "stdout.txt";
-
-			//if the file exists, delete it so we can start clean
-			File check = new File(f);
-			if(check.exists()) { check.delete(); }
-
-			//String f = "../../logs/" + sessionID + "-" + getTimeStampForFileName() + ".log";
-			try {
-				log = new PrintWriter(new BufferedWriter(new FileWriter(f, true)));
-				log_file = f;
-				logFileOpen = true;
-			} catch(IOException e) {
-				log("openLogFile(): IOException opening log file " + f + ":" + e.getMessage());
-			}
-		} else {
-			log("openLogFile(): a log file is already opened!");
-		}
-	} //end openLogFile()
-	
-	public static void writeLogFile(String msg) {
-		if(logFileOpen) {
-			log.println(msg);
-			log.flush();
-		} else {
-			//no log file is open!
-		}
-	} //end writeLogFile()
-	
-	public static void closeLogFile() {
-		if(logFileOpen) {
-			log.close();
-			logFileOpen = false;
-			log("closeLogFile(): log file " + log_file + " closed");
-			log_file = "[null]";
-		}
-	} //end closeLogFile()
-	
-	public static void log(String msg) {
-		log(msg, 0);
-		//System.out.println(getTimeStamp() + " " + msg);
-	}
-	
-	public static void log(String msg, int level) {
-		String l = "";
-		switch(level) {
-		case 0: l = " "; break;
-		case 1: l = " [V1] "; break;
-		case 2: l = " [V2] "; break;
-		}
-		if(log_level >= level) {
-			System.out.println(getTimeStamp() + l + msg);
-			
-		}
-		if(logFileOpen) writeLogFile(getTimeStamp() + l + msg);
-		//if(iDebug) iPause();
-	} //end log()
-	
-	public static void logStackTrace(Exception e) {
-		StringWriter stack = new StringWriter();
-		e.printStackTrace(new PrintWriter(stack));
-		log("[stack]: " + stack.toString());
-	}
-	
-	public static String getTimeStamp() {
-		Calendar c = Calendar.getInstance();
-		return "[" + (c.get(Calendar.HOUR_OF_DAY) < 10 ? "0" + c.get(Calendar.HOUR_OF_DAY) : c.get(Calendar.HOUR_OF_DAY)).toString() + 
-				":" + (c.get(Calendar.MINUTE) < 10 ? "0" + c.get(Calendar.MINUTE) : c.get(Calendar.MINUTE)).toString() + 
-				":" + (c.get(Calendar.SECOND) < 10 ? "0" + c.get(Calendar.SECOND) : c.get(Calendar.SECOND)).toString() + "]"; 
-	}
-	
-	public static String getTimeStampForFileName() {
-		Calendar c = Calendar.getInstance();
-		
-		return (c.get(Calendar.HOUR_OF_DAY) < 10 ? "0" + c.get(Calendar.HOUR_OF_DAY) : c.get(Calendar.HOUR_OF_DAY)).toString() + 
-			   (c.get(Calendar.MINUTE) < 10 ? "0" + c.get(Calendar.MINUTE) : c.get(Calendar.MINUTE)).toString() + 
-			   (c.get(Calendar.SECOND) < 10 ? "0" + c.get(Calendar.SECOND) : c.get(Calendar.SECOND)).toString();
-	}
-
-	public static long getUNIXTimestamp() {
-		return Calendar.getInstance().getTimeInMillis() / 1000;
-	}
-
-	public static String getDateString() {
-		Calendar c = Calendar.getInstance();
-		
-		String[] months = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-		
-		return months[c.get(Calendar.MONTH)] + " " + c.get(Calendar.DAY_OF_MONTH) + ", " + c.get(Calendar.YEAR) + " " + 
-			c.get(Calendar.HOUR) + ":" + (c.get(Calendar.MINUTE) < 10 ? "0" + c.get(Calendar.MINUTE) : c.get(Calendar.MINUTE)).toString() +
-			(c.get(Calendar.AM_PM) == Calendar.AM ? "am" : "pm") + " " +
-			TimeZone.getDefault().getDisplayName(TimeZone.getDefault().inDaylightTime(new Date()), TimeZone.SHORT);
-	}
-
-	//==============================================
-	// Utility functions
-	//==============================================
-	//random number generator -- range: [0, max)
-	public static int rand(int max) { return (int)(Math.random() * max); }
-
-	//string join function as in PHP
-	// (http://stackoverflow.com/questions/1515437/java-function-for-arrays-like-phps-join)
-	public static String join(String r[],String d) {
-		if (r.length == 0) return "";
-	    StringBuilder sb = new StringBuilder();
-	    int i;
-	    for(i=0;i<r.length-1;i++)
-	    	sb.append(r[i]+d);
-	    return sb.toString()+r[i];
-	}
-
-	private static String getProcessID() {
-		Integer pid = -1;
-		String r = "(n/a)";
-		
+	public static void writeFile(String file, String text, boolean append) {
+		BufferedWriter fileWriter = null;
 		try {
-			java.lang.management.RuntimeMXBean runtime = java.lang.management.ManagementFactory.getRuntimeMXBean();
-			java.lang.reflect.Field jvm = runtime.getClass().getDeclaredField("jvm");
-			jvm.setAccessible(true);
-			sun.management.VMManagement mgmt = (sun.management.VMManagement) jvm.get(runtime);
-			java.lang.reflect.Method pid_method =  
-    		mgmt.getClass().getDeclaredMethod("getProcessId");
-			pid_method.setAccessible(true);
-		
-			pid = (Integer) pid_method.invoke(mgmt);
-			r = pid.toString();
-		} catch(Exception e) {
-			log("getProcessID(): exception occurred: " + e.getMessage());
-			pid = -1;
-			r = "(n/a)";
+			fileWriter = new BufferedWriter(new FileWriter(file, append));
+		} catch (IOException e) {
+			Logger.error("Could not find file: " + file);
+			Logger.logStackTrace(e);
 		}
-		
-		return pid.toString();
-	} //end getProcessID()
-} //end class App
+
+		try {
+			fileWriter.write(text);
+			fileWriter.close(); // Close calls flush
+		} catch (IOException e1) {
+			Logger.logStackTrace(e1);
+		}
+	}
+}
