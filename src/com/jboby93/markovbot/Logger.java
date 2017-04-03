@@ -9,49 +9,31 @@ import java.io.StringWriter;
 
 public class Logger {
 	
-	private static final int log_level = 0;
-	private static String log_file = null; // Log file name
-	private static boolean logFileOpen = false;
+	private static final String LOG_FILE_NAME = "Log.txt"; // Log file name
 	private static PrintWriter log; // The log itself
 
 	public static void openLogFile() {
-		if (!logFileOpen) {
-			String fileName = "stdout.txt";
-	
-			//if the file exists, delete it so we can start clean
-			File check = new File(fileName);
-			if (check.exists()) {
-				check.delete();
-			}
-	
-			//String f = "../../logs/" + sessionID + "-" + getTimeStampForFileName() + ".log";
+		if (log == null) {
 			try {
-				log = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
-				log_file = fileName;
-				logFileOpen = true;
+				log = new PrintWriter(new FileWriter(LOG_FILE_NAME, true)); // Always appending to log
 			} catch (IOException e) {
-				log("IOException opening log file " + fileName + ":" + e.getMessage());
+				// You won't be able to log the failure if you can't instantiate the log in the first place
+				e.printStackTrace();
 			}
-		} else {
-			log("A log file is already opened!");
 		}
 	}
 
 	public static void writeLogFile(String msg) {
-		if (logFileOpen) {
-			log.println(msg);
-			log.flush();
-		} else {
-			//no log file is open!
+		if (log != null) {
+			log.println(msg); // println automatically flushes
 		}
 	}
 
 	public static void closeLogFile() {
-		if (logFileOpen) {
+		if (log != null) {
 			log.close();
-			logFileOpen = false;
-			log("closeLogFile(): log file " + log_file + " closed");
-			log_file = "[null]";
+			log("closeLogFile(): log file " + LOG_FILE_NAME + " closed");
+			log = null;
 		}
 	}
 
@@ -72,12 +54,12 @@ public class Logger {
 			l = " [V2] ";
 			break;
 		}
+		String entry = Tools.getTimeStamp() +l+msg;
 		if (log_level >= level) {
-			System.out.println(Tools.getTimeStamp() + l + msg);
-	
+			System.out.println(entry);
 		}
-		if (logFileOpen)
-			writeLogFile(Tools.getTimeStamp() + l + msg);
+		
+		writeLogFile(entry);
 	}
 
 	public static void logStackTrace(Exception e) {
