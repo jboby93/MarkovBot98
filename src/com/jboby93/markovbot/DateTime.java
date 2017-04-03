@@ -17,17 +17,14 @@ public class DateTime {
 	}
 	
 	
-	// Long date
 	public String getDateString() {
 		return longDate.format(date);
 	}
 
-	// Short date
 	public String getTimeStampForFileName() {
 		return timeStamp.format(date);
 	}
 
-	// Short date with []
 	public String getTimeStamp() {
 		return "["+timeStamp.format(date)+"]";
 	}
