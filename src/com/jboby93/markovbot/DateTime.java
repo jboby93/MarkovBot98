@@ -1,13 +1,14 @@
 package com.jboby93.markovbot;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class DateTime {
 	
 	private Date date;
-	private SimpleDateFormat longDate;
-	private SimpleDateFormat timeStamp;
+	private DateFormat longDate;
+	private DateFormat timeStamp;
 	
 	public DateTime(){
 		this.date = new Date();
