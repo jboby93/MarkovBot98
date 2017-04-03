@@ -5,11 +5,12 @@ import java.io.IOException;
 public class MarkovBot {
 	public static final String GENERATE_ERROR_NODATA = "#GENERATE_ERROR_NODATA#";
 	
-	private Exception lastException = null;
+	private Exception lastException;
 	private MarkovDB _db;
 
 	public MarkovBot() {
 		_db = new MarkovDB();
+		lastException = null;
 	}
 
 	public String generate() {

@@ -331,7 +331,7 @@ public class App {
 			System.out.flush();
 
 			String ask = reader.readLine().toLowerCase();
-			switch (ask.toLowerCase()) {
+			switch (ask) {
 			case "save":
 				saveLastResultToFile();
 				break;
