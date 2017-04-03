@@ -219,14 +219,14 @@ public class MarkovDB {
 		String lines[] = in.split(App.NL);
 
 		for (String s : lines) {
-			if (s.trim().equals(""))
+			if (s.trim().isEmpty())
 				continue;
 
 			String[] pair = s.split(keyvalue_sep);
 			String key = pair[0].trim();
 
 			if (s.startsWith("N=")) {
-				s.replace("N=", "");
+				s = s.replace("N=", "");
 				if (s.matches("\\d+")){
 					this.n = Integer.parseInt(s);
 				} else {
@@ -239,8 +239,10 @@ public class MarkovDB {
 				}
 
 				List<String> valueList = new ArrayList<String>();
-				for (String v : value) {
-					valueList.add(v);
+				if (value != null){
+					for (String v : value) {
+						valueList.add(v);
+					}
 				}
 
 				if (append) {

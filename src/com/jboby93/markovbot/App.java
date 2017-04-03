@@ -432,7 +432,7 @@ public class App {
 		String out = "";
 		String line = null;
 		while ((line = fileReader.readLine()) != null) {
-			out += line;
+			out += line+App.NL;
 		}
 		fileReader.close();
 		return out;
