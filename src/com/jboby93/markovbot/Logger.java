@@ -6,10 +6,10 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 public class Logger {
-	
+
 	private static final String LOG_FILE_NAME = "Log.txt"; // Log file name
 	private static PrintWriter log; // The log itself
-	private static final int logLevel = 0;
+	private static final LogLevel logLevel = LogLevel.VERBOSE; // Show all logs
 
 	public static void openLogFile() {
 		if (log == null) {
@@ -30,40 +30,39 @@ public class Logger {
 
 	public static void closeLogFile() {
 		if (log != null) {
-			log("closeLogFile(): log file " + LOG_FILE_NAME + " closed");
+			debug("closeLogFile(): log file " + LOG_FILE_NAME + " closed");
 			log.close();
 			log = null;
 		}
 	}
 
-	public static void log(String msg) {
-		log(msg, 0);
+	public static void info(String msg) {
+		log(msg, LogLevel.INFO);
 	}
 
-	public static void log(String msg, int level) {
-		String l = "";
-		switch (level) {
-		case 0:
-			l = " ";
-			break;
-		case 1:
-			l = " [V1] ";
-			break;
-		case 2:
-			l = " [V2] ";
-			break;
-		}
-		String entry = Tools.getTimeStamp() +l+msg;
-		if (logLevel >= level) {
+	public static void debug(String msg) {
+		log(msg, LogLevel.DEBUG);
+	}
+
+	public static void warning(String msg) {
+		log(msg, LogLevel.WARNING);
+	}
+
+	public static void error(String msg) {
+		log(msg, LogLevel.ERROR);
+	}
+
+	private static void log(String msg, LogLevel level) {
+		String entry = Tools.getTimeStamp() + level.toString() + msg;
+		if (logLevel.ordinal() >= level.ordinal()) {
 			System.out.println(entry);
 		}
-		
 		writeLogFile(entry);
 	}
 
 	public static void logStackTrace(Exception e) {
 		StringWriter stack = new StringWriter();
 		e.printStackTrace(new PrintWriter(stack));
-		log("[stack]: " + stack.toString());
+		error("[stack]: " + stack.toString());
 	}
 }
