@@ -3,13 +3,13 @@ package com.jboby93.markovbot;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DBSearchResult implements Comparable<DBSearchResult>{
+public class DBSearchResult implements Comparable<DBSearchResult> {
 	private Integer index;
 	private Integer score;
 	private String key;
 	private List<String> value;
-	
-	public DBSearchResult(){
+
+	public DBSearchResult() {
 		this.index = -1;
 		this.score = 0;
 		this.key = null;
@@ -52,7 +52,7 @@ public class DBSearchResult implements Comparable<DBSearchResult>{
 	@Override
 	public int compareTo(DBSearchResult other) {
 		int c = -(this.score.compareTo(other.getScore())); // Sort by descending score
-		if (c == 0){ // Same score, sort by index
+		if (c == 0) { // Same score, sort by index
 			return this.index.compareTo(other.getIndex());
 		} else {
 			return c;

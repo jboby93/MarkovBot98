@@ -4,7 +4,7 @@ import java.io.IOException;
 
 public class MarkovBot {
 	public static final String GENERATE_ERROR_NODATA = "#GENERATE_ERROR_NODATA#";
-	
+
 	private Exception lastException;
 	private MarkovDB _db;
 

@@ -13,17 +13,17 @@ import java.util.Map;
 
 public class MarkovDB {
 	public static final String NO_ENTRY_FOR_CURRENT_KEY = "NO_ENTRY_FOR_CURRENT_KEY";
-	
+
 	private static final String keyvalue_sep = "#KV_SEP#";
 	private static final String choice_sep = "#SEP#";
-	
+
 	private Map<String, List<String>> _data;
 	private BufferedReader reader;
 	private String currentKey;
 	private boolean modified;
 	private String filename;
 	private int n;
-	
+
 	public int getDBSize() {
 		return _data.size();
 	}
@@ -96,7 +96,7 @@ public class MarkovDB {
 
 	public void teach(String source) {
 		// Replace all whitespace (newline, tab, space, etc) with single spaces then split
-		String[] words = source.replaceAll("\\s+", " ").split(" "); 
+		String[] words = source.replaceAll("\\s+", " ").split(" ");
 
 		for (int i = 0; i < words.length - n - 1; i++) {
 			//form a string consisting of words in range i -> (i+n-1)
@@ -131,7 +131,7 @@ public class MarkovDB {
 	}
 
 	public void load() {
-			load(null);
+		load(null);
 	}
 
 	public void load(String from) {
@@ -146,7 +146,7 @@ public class MarkovDB {
 			System.out.println("2) Close the current database and open a different one");
 			System.out.print("[1/2/[cancel]]: ");
 			System.out.flush();
-			
+
 			String r = null;
 			try {
 				r = reader.readLine();
@@ -167,7 +167,7 @@ public class MarkovDB {
 
 		if (!cancel) {
 			String file = null;
-			if (from == null){
+			if (from == null) {
 				System.out.print("Load from file [or '#cancel']: ");
 				System.out.flush();
 				try {
@@ -227,7 +227,7 @@ public class MarkovDB {
 
 			if (s.startsWith("N=")) {
 				s = s.replace("N=", "");
-				if (s.matches("\\d+")){
+				if (s.matches("\\d+")) {
 					this.n = Integer.parseInt(s);
 				} else {
 					// Invalid format for the N=# line
@@ -239,7 +239,7 @@ public class MarkovDB {
 				}
 
 				List<String> valueList = new ArrayList<String>();
-				if (value != null){
+				if (value != null) {
 					for (String v : value) {
 						valueList.add(v);
 					}
@@ -292,9 +292,9 @@ public class MarkovDB {
 		System.out.flush();
 		String file = reader.readLine();
 		if (!file.toLowerCase().equals("#cancel")) {
-				writeToFile(file);
-				filename = file;
-				modified = false;
+			writeToFile(file);
+			filename = file;
+			modified = false;
 		}
 	}
 
@@ -302,14 +302,14 @@ public class MarkovDB {
 		// Just instantiate a new writer here, simpler
 		BufferedWriter fileWriter = new BufferedWriter(new FileWriter(file));
 		fileWriter.write("N=" + this.n);
-		
+
 		for (String key : _data.keySet()) {
 			List<String> values = _data.get(key);
 			String line = "";
-		
+
 			for (int i = 0; i < values.size(); i++) {
 				line += values.get(i);
-				if (i < values.size()-1){
+				if (i < values.size() - 1) {
 					line += choice_sep;
 				}
 			}
@@ -335,10 +335,10 @@ public class MarkovDB {
 			thisResult.setKey(key);
 			thisResult.setValue(_data.get(key));
 			thisResult.setIndex(index++); // Index isn't used past here, increment now
-			
+
 			int score = thisResult.getScore();
 			for (String term : terms) {
-				
+
 				//key matches +2
 				if (key.toLowerCase().contains(term.toLowerCase())) {
 					score += 2;
@@ -356,23 +356,25 @@ public class MarkovDB {
 				}
 			} //end for(each search term)
 			thisResult.setScore(score);
-			
+
 			//any hits?
 			if (score > 0) {
 				results.add(thisResult);
 			}
 		}
-		
+
 		/*
-		 * Shouldn't rely on implementation-specific ordering of any data structure using hashing
-		 * Safer to manually order things at the end with a Comparator
+		 * Shouldn't rely on implementation-specific ordering of any data
+		 * structure using hashing Safer to manually order things at the end
+		 * with a Comparator
 		 * 
-		 * DBSearchResult implements the Comparable interface, so instances can be determined
-		 * to be greater or less than each other for sorting purposes
+		 * DBSearchResult implements the Comparable interface, so instances can
+		 * be determined to be greater or less than each other for sorting
+		 * purposes
 		 */
-		
+
 		Collections.sort(results);
-		
+
 		return results;
 	}
 

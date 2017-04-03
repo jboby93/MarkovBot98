@@ -19,9 +19,9 @@ public class Tools {
 	//string join function as in PHP
 	public static String join(String r[], String d) {
 		String out = "";
-		for (int i = 0; i < r.length; i++){
+		for (int i = 0; i < r.length; i++) {
 			out += r[i];
-			if (i != r.length-1){
+			if (i != r.length - 1) {
 				out += d;
 			}
 		}
@@ -33,8 +33,8 @@ public class Tools {
 
 		/*
 		 * When Java 9 is alpha, this whole process will be doable in one line:
-		 * long pid = ProcessHandle.current().getPid();
-		 * As opposed to using hacky reflection
+		 * long pid = ProcessHandle.current().getPid(); As opposed to using
+		 * hacky reflection
 		 */
 		try {
 			RuntimeMXBean runtime = ManagementFactory.getRuntimeMXBean();
@@ -52,7 +52,7 @@ public class Tools {
 
 		return pid.toString();
 	}
-	
+
 	public static String getTimeStamp() {
 		Calendar c = Calendar.getInstance();
 		return "["
