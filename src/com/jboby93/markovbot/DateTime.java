@@ -1,10 +1,23 @@
 package com.jboby93.markovbot;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
 public class DateTime {
+	
+	private Calendar calendar;
+	private SimpleDateFormat longDate;
+	private SimpleDateFormat timeStamp;
+	
+	public DateTime(){
+		this.calendar = Calendar.getInstance();
+		this.longDate = new SimpleDateFormat("MMMM DD, YYYY hh:mm a 'Z'");
+		this.timeStamp = new SimpleDateFormat("HH:mm:ss");
+	}
+	
+	
 
 	public static String getDateString() {
 		Calendar c = Calendar.getInstance();
