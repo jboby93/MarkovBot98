@@ -1,7 +1,5 @@
 package com.jboby93.markovbot;
 
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -11,6 +9,7 @@ public class Logger {
 	
 	private static final String LOG_FILE_NAME = "Log.txt"; // Log file name
 	private static PrintWriter log; // The log itself
+	private static final int logLevel = 0;
 
 	public static void openLogFile() {
 		if (log == null) {
@@ -55,7 +54,7 @@ public class Logger {
 			break;
 		}
 		String entry = Tools.getTimeStamp() +l+msg;
-		if (log_level >= level) {
+		if (logLevel >= level) {
 			System.out.println(entry);
 		}
 		
