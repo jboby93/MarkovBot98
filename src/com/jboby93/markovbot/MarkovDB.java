@@ -1,6 +1,10 @@
 package com.jboby93.markovbot;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,6 +21,8 @@ public class MarkovDB {
 	private String currentKey = "null";
 	private boolean modified = false;
 	private String filename = "null";
+	
+	private BufferedReader reader;
 
 	
 	public int getDBSize() {
@@ -31,6 +37,7 @@ public class MarkovDB {
 
 	public MarkovDB() {
 		this(2);
+		reader = new BufferedReader(new InputStreamReader(System.in));
 	}
 
 	public MarkovDB(int n) {
@@ -126,20 +133,28 @@ public class MarkovDB {
 	}
 
 	public void load() {
-		load("null");
+		try {
+			load("null");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
-	public void load(String from) {
+	public void load(String from) throws IOException {
 		boolean append = false;
 		boolean cancel = false;
 
 		if (!filename.equals("null")) {
 			//prompt before changing databases
-			App.println("There is already a database currently open: " + filename);
-			App.println("What do you want to do?");
-			App.println("1) Import to current database");
-			App.println("2) Close the current database and open a different one");
-			String r = App.readLine("[1/2/[cancel]]: ");
+			System.out.println("There is already a database currently open: " + filename);
+			System.out.println("What do you want to do?");
+			System.out.println("1) Import to current database");
+			System.out.println("2) Close the current database and open a different one");
+			System.out.println("[1/2/[cancel]]: ");
+			System.out.flush();
+			
+			String r = reader.readLine();
 			switch (r) {
 			case "1":
 				append = true;
@@ -153,17 +168,25 @@ public class MarkovDB {
 		}
 
 		if (!cancel) {
-			String file = (from.equals("null") ? App.readLine("Load from file [or '#cancel']: ") : from);
+			String file = null;
+			if (from.equals("null")){
+				System.out.println("Load from file [or '#cancel']: ");
+				System.out.flush();
+				
+				file = reader.readLine();
+			} else {
+				file = from;
+			}
 			if (!file.toLowerCase().equals("#cancel")) {
 				try {
 					readFromFile(file, append);
 					filename = file;
 				} catch (IOException e) {
 					App.logStackTrace(e);
-				} //end try
-			} //end if
-		} //end if
-	} //end load()
+				}
+			}
+		}
+	}
 
 	public void load_replace(String from) {
 		try {
@@ -198,52 +221,51 @@ public class MarkovDB {
 			if (s.trim().equals(""))
 				continue;
 
-			String pair[] = s.split(keyvalue_sep);
+			String[] pair = s.split(keyvalue_sep);
 			String key = pair[0].trim();
 
-			if (App.Left(s, 2).equals("N=")) {
-				try {
-					int n = Integer.parseInt(s.replace("N=", ""));
-					this.n = n;
-				} catch (Exception e) {
-					//invalid format for N=# line
-					//
+			if (s.startsWith("N=")) {
+				s.replace("N=", "");
+				if (s.matches("\\d+")){
+					this.n = Integer.parseInt(s);
+				} else {
+					// Invalid format for the N=# line
 				}
 			} else {
-				String value[] = {};
+				String[] value = null;
 				if (pair.length == 2) {
 					value = pair[1].split(choice_sep);
 				}
 
-				ArrayList<String> value_list = new ArrayList<String>();
+				List<String> valueList = new ArrayList<String>();
 				for (String v : value) {
-					value_list.add(v);
+					valueList.add(v);
 				}
 
 				if (append) {
 					if (_data.containsKey(key)) {
 						for (String l : _data.get(key)) {
-							value_list.add(l);
+							valueList.add(l);
 						}
 					}
-				} //end if
+				}
 
-				_data.put(key, value_list);
+				_data.put(key, valueList);
 			}
-		} //end for
+		}
 
 		App.log("db.readFromFile(): read " + (lines.length - 1) + " entries from file " + file);
-	} //end readFromFile()
+	}
 
-	public void save(String to) {
+	public void save(String fileName) {
 		try {
-			writeToFile(to);
+			writeToFile(fileName);
 			modified = false;
-			filename = to;
+			filename = fileName;
 		} catch (IOException e) {
 			App.logStackTrace(e);
 		}
-	} //end save()
+	}
 
 	public void save() {
 		if (filename.equals("null")) {
@@ -256,45 +278,39 @@ public class MarkovDB {
 				App.logStackTrace(e);
 			}
 		}
-	} //end save()
+	}
 
 	public void saveAs() {
-		String file = App.readLine("Save to file [or '#cancel']: ");
+		System.out.print("Save to file [or '#cancel']: ");
+		System.out.flush();
+		String file = reader.readLine();
 		if (!file.toLowerCase().equals("#cancel")) {
-			try {
 				writeToFile(file);
 				filename = file;
 				modified = false;
-			} catch (IOException e) {
-				App.logStackTrace(e);
-			} //end try
-		} //end if
-	} //end saveAs()
+		}
+	}
 
 	private void writeToFile(String file) throws IOException {
-		//generate the output to write to the file
-		ArrayList<String> out = new ArrayList<String>();
-		out.add("N=" + this.n);
-		for (Map.Entry<String, List<String>> pair : _data.entrySet()) {
-			String key = pair.getKey();
-			Object value_arr[] = pair.getValue().toArray();
-
-			StringBuilder value_sb = new StringBuilder();
-			int i = 0;
-			for (Object s : value_arr) {
-				value_sb.append((String) s);
-				//is there more?
-				if (i + 1 < pair.getValue().size())
-					value_sb.append(choice_sep);
-				i++; //bug fix (3/28/2016) - was missing this increment; could be why the database size seems to fluctuate
+		// Just instantiate a new writer here, simpler
+		BufferedWriter fileWriter = new BufferedWriter(new FileWriter(file));
+		fileWriter.write("N=" + this.n);
+		
+		for (String key : _data.keySet()) {
+			List<String> values = _data.get(key);
+			String line = "";
+		
+			for (int i = 0; i < values.size(); i++) {
+				line += values.get(i);
+				if (i < values.size()-1){
+					line += choice_sep;
+				}
 			}
-			String value = value_sb.toString(); //App.join((String[])pair.getValue().toArray(), choice_sep);
-			out.add(key + keyvalue_sep + value);
+			fileWriter.write(key + keyvalue_sep + line);
 		}
-
-		App.writeLines(file, out);
-		App.log("db.writeToFile(): wrote " + (out.size() - 1) + " entries to file " + file);
-	} //end writeToFile()
+		fileWriter.close();
+		App.log("db.writeToFile(): wrote " + (_data.keySet().size()) + " entries to file " + file);
+	}
 
 	public void clear() {
 		_data.clear();
