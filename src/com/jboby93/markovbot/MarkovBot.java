@@ -29,7 +29,7 @@ public class MarkovBot {
 		//ready to go?
 		if (_db.getCurrentKey() == null) {
 			//data model is empty
-			App.log("generate(): generate failed; no data to work with");
+			Logger.log("generate(): generate failed; no data to work with");
 			return GENERATE_ERROR_NODATA;
 		} else {
 			//let's do it
@@ -76,7 +76,7 @@ public class MarkovBot {
 
 			return 0;
 		} catch (IOException e) {
-			App.logStackTrace(e);
+			Logger.logStackTrace(e);
 			return -1;
 		}
 	} //end learnFromFile()

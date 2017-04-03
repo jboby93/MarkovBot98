@@ -52,7 +52,7 @@ public class MarkovDB {
 		//pick random n-gram from the database to start word generation from
 		if (_data.entrySet().size() == 0) {
 			//database is empty?
-			App.log("randomize(): error; data model size is 0");
+			Logger.log("randomize(): error; data model size is 0");
 			currentKey = null;
 		} else {
 			int start = Tools.rand(_data.entrySet().size() - 1);
@@ -151,7 +151,7 @@ public class MarkovDB {
 			try {
 				r = reader.readLine();
 			} catch (IOException e) {
-				App.logStackTrace(e);
+				Logger.logStackTrace(e);
 			}
 			switch (r) {
 			case "1":
@@ -173,7 +173,7 @@ public class MarkovDB {
 				try {
 					file = reader.readLine();
 				} catch (IOException e) {
-					App.logStackTrace(e);
+					Logger.logStackTrace(e);
 				}
 			} else {
 				file = from;
@@ -183,7 +183,7 @@ public class MarkovDB {
 					readFromFile(file, append);
 					filename = file;
 				} catch (IOException e) {
-					App.logStackTrace(e);
+					Logger.logStackTrace(e);
 				}
 			}
 		}
@@ -193,9 +193,9 @@ public class MarkovDB {
 		try {
 			readFromFile(from, false);
 			filename = from;
-			App.log("db.load_replace(): replaced previous database with " + from);
+			Logger.log("db.load_replace(): replaced previous database with " + from);
 		} catch (IOException e) {
-			App.logStackTrace(e);
+			Logger.logStackTrace(e);
 		} //end try
 	}
 
@@ -203,9 +203,9 @@ public class MarkovDB {
 		try {
 			readFromFile(from, true);
 			filename = from;
-			App.log("db.load_import(): imported " + from + " to current database");
+			Logger.log("db.load_import(): imported " + from + " to current database");
 		} catch (IOException e) {
-			App.logStackTrace(e);
+			Logger.logStackTrace(e);
 		} //end try
 	}
 
@@ -257,7 +257,7 @@ public class MarkovDB {
 			}
 		}
 
-		App.log("db.readFromFile(): read " + (lines.length - 1) + " entries from file " + file);
+		Logger.log("db.readFromFile(): read " + (lines.length - 1) + " entries from file " + file);
 	}
 
 	public void save(String fileName) {
@@ -266,7 +266,7 @@ public class MarkovDB {
 			modified = false;
 			filename = fileName;
 		} catch (IOException e) {
-			App.logStackTrace(e);
+			Logger.logStackTrace(e);
 		}
 	}
 
@@ -275,14 +275,14 @@ public class MarkovDB {
 			try {
 				saveAs();
 			} catch (IOException e) {
-				App.logStackTrace(e);
+				Logger.logStackTrace(e);
 			}
 		} else {
 			try {
 				writeToFile(filename);
 				modified = false;
 			} catch (IOException e) {
-				App.logStackTrace(e);
+				Logger.logStackTrace(e);
 			}
 		}
 	}
@@ -316,7 +316,7 @@ public class MarkovDB {
 			fileWriter.write(key + keyvalue_sep + line);
 		}
 		fileWriter.close();
-		App.log("db.writeToFile(): wrote " + (_data.keySet().size()) + " entries to file " + file);
+		Logger.log("db.writeToFile(): wrote " + (_data.keySet().size()) + " entries to file " + file);
 	}
 
 	public void clear() {

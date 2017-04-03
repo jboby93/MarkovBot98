@@ -2,13 +2,10 @@ package com.jboby93.markovbot;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,13 +16,6 @@ public class App {
 	public static final String build_date = "5/10/2016";
 	public static final String NL = System.getProperty("line.separator");
 
-	/*
-	 * The @SuppressWarnings tags stop the compiler from complaining that some
-	 * variables are declared but not being used. I've made the assumption that
-	 * they are used in some component I haven't seen yet If they actually
-	 * aren't being used, you should consider removal
-	 */
-	private static final int log_level = 0;
 	@SuppressWarnings("unused")
 	private static String processID = null; // Process ID
 	private static MarkovBot bot; // The bot to use
@@ -33,11 +23,6 @@ public class App {
 	private static String startTimeString = null;
 	@SuppressWarnings("unused")
 	private static long startTime = -1;
-
-	// Logging
-	private static String log_file = null; // Log file name
-	private static boolean logFileOpen = false;
-	private static PrintWriter log; // The log itself
 
 	private static BufferedReader reader; // BufferedReader is more efficient than scanner
 
@@ -54,10 +39,10 @@ public class App {
 		processID = Tools.getProcessID();
 
 		try {
-			openLogFile();
-			log(name + " - v" + version + " (" + build_date + ")");
-			log("main(): program started on " + startTimeString);
-			log("main(): creating bot instance");
+			Logger.openLogFile();
+			Logger.log(name + " - v" + version + " (" + build_date + ")");
+			Logger.log("main(): program started on " + startTimeString);
+			Logger.log("main(): creating bot instance");
 			bot = new MarkovBot();
 
 			System.out.println("[This is the open-source and non-Facebook-connected version of TextpostBot 98.]");
@@ -226,7 +211,7 @@ public class App {
 					} else {
 						switch (cmd[1]) {
 						case "time":
-							log("getUNIXTimestamp() returned " + Tools.getUNIXTimestamp());
+							Logger.log("getUNIXTimestamp() returned " + Tools.getUNIXTimestamp());
 							break;
 						default:
 							System.out.println("Invalid debug command");
@@ -253,8 +238,8 @@ public class App {
 			panic(e);
 		}
 
-		log("main(): exiting");
-		closeLogFile();
+		Logger.log("main(): exiting");
+		Logger.closeLogFile();
 	}
 
 	public static void generatePost(String args[]) throws IOException {
@@ -339,7 +324,7 @@ public class App {
 		} else {
 			//canceled due to error or other reason
 			if (bot.getDBSize() == 0) {
-				log("generatePost(): can't generate shit; database is empty!");
+				Logger.log("generatePost(): can't generate shit; database is empty!");
 			}
 		}
 
@@ -360,7 +345,7 @@ public class App {
 			try {
 				file = reader.readLine();
 			} catch (IOException e) {
-				logStackTrace(e);
+				Logger.logStackTrace(e);
 			}
 		} else {
 			file = args[1];
@@ -385,7 +370,7 @@ public class App {
 			try {
 				input = reader.readLine();
 			} catch (IOException e) {
-				logStackTrace(e);
+				Logger.logStackTrace(e);
 			}
 
 			if (input.equals(cancel)) {
@@ -409,7 +394,7 @@ public class App {
 		try {
 			file = reader.readLine();
 		} catch (IOException e1) {
-			logStackTrace(e1);
+			Logger.logStackTrace(e1);
 		}
 		if (file.equals("#cancel")) {
 			System.out.println("Operation cancelled.");
@@ -421,8 +406,8 @@ public class App {
 
 	//on process crash, halt all threads
 	private static void panic(Exception e) {
-		log("panic(): panic handler invoked on exception -- the program will stop");
-		logStackTrace(e);
+		Logger.log("panic(): panic handler invoked on exception -- the program will stop");
+		Logger.logStackTrace(e);
 		//hopefully from here the process can then end
 	}
 
@@ -445,7 +430,7 @@ public class App {
 		try {
 			response = reader.readLine();
 		} catch (IOException e) {
-			logStackTrace(e);
+			Logger.logStackTrace(e);
 		}
 		return (response.toLowerCase().charAt(0) == 'y');
 	}
@@ -459,87 +444,15 @@ public class App {
 		try {
 			fileWriter = new BufferedWriter(new FileWriter(file, append));
 		} catch (IOException e) {
-			log("Could not find file: " + file);
-			logStackTrace(e);
+			Logger.log("Could not find file: " + file);
+			Logger.logStackTrace(e);
 		}
 
 		try {
 			fileWriter.write(text);
 			fileWriter.close(); // Close calls flush
 		} catch (IOException e1) {
-			logStackTrace(e1);
+			Logger.logStackTrace(e1);
 		}
-	}
-
-	public static void openLogFile() {
-		if (!logFileOpen) {
-			String fileName = "stdout.txt";
-
-			//if the file exists, delete it so we can start clean
-			File check = new File(fileName);
-			if (check.exists()) {
-				check.delete();
-			}
-
-			//String f = "../../logs/" + sessionID + "-" + getTimeStampForFileName() + ".log";
-			try {
-				log = new PrintWriter(new BufferedWriter(new FileWriter(fileName, true)));
-				log_file = fileName;
-				logFileOpen = true;
-			} catch (IOException e) {
-				log("IOException opening log file " + fileName + ":" + e.getMessage());
-			}
-		} else {
-			log("A log file is already opened!");
-		}
-	}
-
-	public static void writeLogFile(String msg) {
-		if (logFileOpen) {
-			log.println(msg);
-			log.flush();
-		} else {
-			//no log file is open!
-		}
-	}
-
-	public static void closeLogFile() {
-		if (logFileOpen) {
-			log.close();
-			logFileOpen = false;
-			log("closeLogFile(): log file " + log_file + " closed");
-			log_file = "[null]";
-		}
-	}
-
-	public static void log(String msg) {
-		log(msg, 0);
-	}
-
-	public static void log(String msg, int level) {
-		String l = "";
-		switch (level) {
-		case 0:
-			l = " ";
-			break;
-		case 1:
-			l = " [V1] ";
-			break;
-		case 2:
-			l = " [V2] ";
-			break;
-		}
-		if (log_level >= level) {
-			System.out.println(Tools.getTimeStamp() + l + msg);
-
-		}
-		if (logFileOpen)
-			writeLogFile(Tools.getTimeStamp() + l + msg);
-	}
-
-	public static void logStackTrace(Exception e) {
-		StringWriter stack = new StringWriter();
-		e.printStackTrace(new PrintWriter(stack));
-		log("[stack]: " + stack.toString());
 	}
 }

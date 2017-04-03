@@ -46,7 +46,7 @@ public class Tools {
 
 			pid = (Integer) pid_method.invoke(mgmt);
 		} catch (Exception e) {
-			App.log("getProcessID(): exception occurred: " + e.getMessage());
+			Logger.log("getProcessID(): exception occurred: " + e.getMessage());
 			pid = -1;
 		}
 
