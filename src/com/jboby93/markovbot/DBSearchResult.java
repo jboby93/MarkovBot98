@@ -12,7 +12,7 @@ public class DBSearchResult implements Comparable<DBSearchResult>{
 	public DBSearchResult(){
 		this.index = -1;
 		this.score = 0;
-		this.key = "null";
+		this.key = null;
 		this.value = new ArrayList<String>();
 	}
 

@@ -27,15 +27,15 @@ public class App {
 	 */
 	private static final int log_level = 0;
 	@SuppressWarnings("unused") 
-	private static String processID = "null"; // Process ID
+	private static String processID = null; // Process ID
 	private static MarkovBot bot; // The bot to use
-	private static String lastResult = "null"; // Last generated result
-	private static String startTimeString = "null";
+	private static String lastResult = null; // Last generated result
+	private static String startTimeString = null;
 	@SuppressWarnings("unused")
 	private static long startTime = -1;
 
 	// Logging
-	private static String log_file = "[null]"; // Log file name
+	private static String log_file = null; // Log file name
 	private static boolean logFileOpen = false;
 	private static PrintWriter log; // The log itself
 

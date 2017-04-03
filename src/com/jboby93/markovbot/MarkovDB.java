@@ -38,9 +38,9 @@ public class MarkovDB {
 	public MarkovDB(int... n) {
 		_data = new HashMap<String, List<String>>();
 		this.n = (n.length == 0) ? 2 : n[0];
-		this.currentKey = "null";
+		this.currentKey = null;
 		this.modified = false;
-		this.filename = "null";
+		this.filename = null;
 		this.reader = new BufferedReader(new InputStreamReader(System.in));
 	}
 
@@ -53,7 +53,7 @@ public class MarkovDB {
 		if (_data.entrySet().size() == 0) {
 			//database is empty?
 			App.log("randomize(): error; data model size is 0");
-			currentKey = "null";
+			currentKey = null;
 		} else {
 			int start = Tools.rand(_data.entrySet().size() - 1);
 			currentKey = (String) _data.keySet().toArray()[start];
@@ -131,14 +131,14 @@ public class MarkovDB {
 	}
 
 	public void load() {
-			load("null");
+			load(null);
 	}
 
 	public void load(String from) {
 		boolean append = false;
 		boolean cancel = false;
 
-		if (!filename.equals("null")) {
+		if (filename != null) {
 			//prompt before changing databases
 			System.out.println("There is already a database currently open: " + filename);
 			System.out.println("What do you want to do?");
@@ -167,7 +167,7 @@ public class MarkovDB {
 
 		if (!cancel) {
 			String file = null;
-			if (from.equals("null")){
+			if (from == null){
 				System.out.println("Load from file [or '#cancel']: ");
 				System.out.flush();
 				try {
@@ -269,7 +269,7 @@ public class MarkovDB {
 	}
 
 	public void save() {
-		if (filename.equals("null")) {
+		if (filename == null) {
 			try {
 				saveAs();
 			} catch (IOException e) {

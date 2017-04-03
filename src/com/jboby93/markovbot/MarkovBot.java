@@ -27,7 +27,7 @@ public class MarkovBot {
 		_db.randomize();
 
 		//ready to go?
-		if (_db.getCurrentKey().equals("null")) {
+		if (_db.getCurrentKey() == null) {
 			//data model is empty
 			App.log("generate(): generate failed; no data to work with");
 			return GENERATE_ERROR_NODATA;
