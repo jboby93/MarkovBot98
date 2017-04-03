@@ -133,15 +133,10 @@ public class MarkovDB {
 	}
 
 	public void load() {
-		try {
 			load("null");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
-	public void load(String from) throws IOException {
+	public void load(String from) {
 		boolean append = false;
 		boolean cancel = false;
 
@@ -154,7 +149,12 @@ public class MarkovDB {
 			System.out.println("[1/2/[cancel]]: ");
 			System.out.flush();
 			
-			String r = reader.readLine();
+			String r = null;
+			try {
+				r = reader.readLine();
+			} catch (IOException e) {
+				App.logStackTrace(e);
+			}
 			switch (r) {
 			case "1":
 				append = true;
@@ -172,8 +172,11 @@ public class MarkovDB {
 			if (from.equals("null")){
 				System.out.println("Load from file [or '#cancel']: ");
 				System.out.flush();
-				
-				file = reader.readLine();
+				try {
+					file = reader.readLine();
+				} catch (IOException e) {
+					App.logStackTrace(e);
+				}
 			} else {
 				file = from;
 			}
@@ -269,7 +272,11 @@ public class MarkovDB {
 
 	public void save() {
 		if (filename.equals("null")) {
-			saveAs();
+			try {
+				saveAs();
+			} catch (IOException e) {
+				App.logStackTrace(e);
+			}
 		} else {
 			try {
 				writeToFile(filename);
@@ -280,7 +287,7 @@ public class MarkovDB {
 		}
 	}
 
-	public void saveAs() {
+	public void saveAs() throws IOException {
 		System.out.print("Save to file [or '#cancel']: ");
 		System.out.flush();
 		String file = reader.readLine();
