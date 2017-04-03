@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import com.jboby93.markovbot.Tools;
+import com.jboby93.markovbot.DateTime;
 
 public class Logger {
 
@@ -55,7 +55,7 @@ public class Logger {
 	}
 
 	private static void log(String msg, LogLevel level) {
-		String entry = Tools.getTimeStamp() + level.toString() + msg;
+		String entry = DateTime.getTimeStamp() + level.toString() + msg;
 		if (logLevel.ordinal() >= level.ordinal()) {
 			System.out.println(entry);
 		}
