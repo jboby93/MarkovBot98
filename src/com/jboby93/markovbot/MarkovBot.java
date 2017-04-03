@@ -29,7 +29,7 @@ public class MarkovBot {
 		//ready to go?
 		if (_db.getCurrentKey() == null) {
 			//data model is empty
-			Logger.log("generate(): generate failed; no data to work with");
+			Logger.warning("generate(): generate failed; no data to work with");
 			return GENERATE_ERROR_NODATA;
 		} else {
 			//let's do it

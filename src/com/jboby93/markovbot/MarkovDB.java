@@ -52,7 +52,7 @@ public class MarkovDB {
 		//pick random n-gram from the database to start word generation from
 		if (_data.entrySet().size() == 0) {
 			//database is empty?
-			Logger.log("randomize(): error; data model size is 0");
+			Logger.error("randomize(): error; data model size is 0");
 			currentKey = null;
 		} else {
 			int start = Tools.rand(_data.entrySet().size() - 1);
@@ -193,7 +193,7 @@ public class MarkovDB {
 		try {
 			readFromFile(from, false);
 			filename = from;
-			Logger.log("db.load_replace(): replaced previous database with " + from);
+			Logger.info("db.load_replace(): replaced previous database with " + from);
 		} catch (IOException e) {
 			Logger.logStackTrace(e);
 		} //end try
@@ -203,7 +203,7 @@ public class MarkovDB {
 		try {
 			readFromFile(from, true);
 			filename = from;
-			Logger.log("db.load_import(): imported " + from + " to current database");
+			Logger.info("db.load_import(): imported " + from + " to current database");
 		} catch (IOException e) {
 			Logger.logStackTrace(e);
 		} //end try
@@ -257,7 +257,7 @@ public class MarkovDB {
 			}
 		}
 
-		Logger.log("db.readFromFile(): read " + (lines.length - 1) + " entries from file " + file);
+		Logger.debug("db.readFromFile(): read " + (lines.length - 1) + " entries from file " + file);
 	}
 
 	public void save(String fileName) {
@@ -316,7 +316,7 @@ public class MarkovDB {
 			fileWriter.write(key + keyvalue_sep + line);
 		}
 		fileWriter.close();
-		Logger.log("db.writeToFile(): wrote " + (_data.keySet().size()) + " entries to file " + file);
+		Logger.debug("db.writeToFile(): wrote " + (_data.keySet().size()) + " entries to file " + file);
 	}
 
 	public void clear() {

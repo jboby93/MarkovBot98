@@ -46,9 +46,9 @@ public class App {
 
 		try {
 			Logger.openLogFile();
-			Logger.log(name + " - v" + version + " (" + build_date + ")");
-			Logger.log("main(): program started on " + startTimeString);
-			Logger.log("main(): creating bot instance");
+			Logger.info(name + " - v" + version + " (" + build_date + ")");
+			Logger.debug("main(): program started on " + startTimeString);
+			Logger.debug("main(): creating bot instance");
 			bot = new MarkovBot();
 
 			System.out.println("[This is the open-source and non-Facebook-connected version of TextpostBot 98.]");
@@ -217,7 +217,7 @@ public class App {
 					} else {
 						switch (cmd[1]) {
 						case "time":
-							Logger.log("getUNIXTimestamp() returned " + Tools.getUNIXTimestamp());
+							Logger.debug("getUNIXTimestamp() returned " + Tools.getUNIXTimestamp());
 							break;
 						default:
 							System.out.println("Invalid debug command");
@@ -244,7 +244,7 @@ public class App {
 			panic(e);
 		}
 
-		Logger.log("main(): exiting");
+		Logger.debug("main(): exiting");
 		Logger.closeLogFile();
 	}
 
@@ -330,7 +330,7 @@ public class App {
 		} else {
 			//canceled due to error or other reason
 			if (bot.getDBSize() == 0) {
-				Logger.log("generatePost(): can't generate shit; database is empty!");
+				Logger.warning("generatePost(): can't generate shit; database is empty!");
 			}
 		}
 
@@ -412,7 +412,7 @@ public class App {
 
 	//on process crash, halt all threads
 	private static void panic(Exception e) {
-		Logger.log("panic(): panic handler invoked on exception -- the program will stop");
+		Logger.error("panic(): panic handler invoked on exception -- the program will stop");
 		Logger.logStackTrace(e);
 		//hopefully from here the process can then end
 	}
@@ -450,7 +450,7 @@ public class App {
 		try {
 			fileWriter = new BufferedWriter(new FileWriter(file, append));
 		} catch (IOException e) {
-			Logger.log("Could not find file: " + file);
+			Logger.error("Could not find file: " + file);
 			Logger.logStackTrace(e);
 		}
 
