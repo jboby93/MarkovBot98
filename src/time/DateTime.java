@@ -1,4 +1,4 @@
-package com.jboby93.markovbot;
+package time;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

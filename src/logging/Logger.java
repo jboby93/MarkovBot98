@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import com.jboby93.markovbot.DateTime;
+import time.DateTime;
 
 public class Logger {
 
