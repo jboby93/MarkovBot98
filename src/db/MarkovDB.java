@@ -80,7 +80,7 @@ public class MarkovDB {
 		}
 
 		//pick one randomly
-		String nextWord = options.get((int)Math.random() * options.size() - 1);
+		String nextWord = options.get((int) Math.random() * options.size() - 1);
 
 		try {
 			String newKey[] = currentKey.split(" ");
@@ -97,7 +97,7 @@ public class MarkovDB {
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			//pick a random new one
-			currentKey = (String) _data.keySet().toArray()[(int)Math.random()*_data.entrySet().size() - 1];
+			currentKey = (String) _data.keySet().toArray()[(int) Math.random() * _data.entrySet().size() - 1];
 		}
 
 		return nextWord;

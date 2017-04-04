@@ -10,8 +10,9 @@ import sun.management.VMManagement;
 
 public class ProcessManager {
 	int processID = -1;
+
 	public int getProcessID() {
-		if (this.processID != -1){
+		if (this.processID != -1) {
 			return this.processID;
 		}
 		Integer pid = -1;
