@@ -9,7 +9,7 @@ import logging.Logger;
 import sun.management.VMManagement;
 
 public class ProcessManager {
-	public static String getProcessID() {
+	public String getProcessID() {
 		Integer pid = -1;
 
 		/*
