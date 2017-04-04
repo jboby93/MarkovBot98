@@ -10,16 +10,11 @@ import java.util.List;
 import java.util.Scanner;
 
 import db.DBSearchResult;
+import logging.About;
 import logging.Logger;
 import time.DateTime;
 
 public class App {
-	public static final String name = "MarkovBot 98";
-	public static final String author = "jboby93";
-	public static final String version = "0.7";
-	public static final String build_date = "5/10/2016";
-	public static final String NL = System.getProperty("line.separator");
-
 	private static MarkovBot bot; 					// The bot to use
 	private static String lastResult = null; 		// Last generated result
 	private static String startTimeString = null;
@@ -47,7 +42,7 @@ public class App {
 			System.out.println("chain generator is given shitposting powers!");
 			System.out.println("");
 
-			System.out.println("Welcome to " + name + " - type 'help' for commands");
+			System.out.println("Welcome to " + About.name + " - type 'help' for commands");
 			boolean quit = false;
 			do {
 				System.out.print("[" + getStatus() + "] > ");
@@ -402,7 +397,7 @@ public class App {
 		String out = "";
 		String line = null;
 		while ((line = fileReader.readLine()) != null) {
-			out += line + App.NL;
+			out += line + About.NL;
 		}
 		fileReader.close();
 		return out;
@@ -416,7 +411,7 @@ public class App {
 	}
 
 	public static void about() {
-		String about = name + " - v" + version + " (" + build_date + ")\n";
+		String about = About.name + " - v" + About.version + " (" + About.build_date + ")\n";
 		Logger.info(about);
 		System.out.println(about);
 	}

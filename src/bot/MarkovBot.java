@@ -3,6 +3,7 @@ package bot;
 import java.io.IOException;
 
 import db.MarkovDB;
+import logging.About;
 import logging.Logger;
 
 public class MarkovBot {
@@ -72,7 +73,7 @@ public class MarkovBot {
 
 	public int learnFromFile(String file) {
 		try {
-			String in[] = App.readFile(file).split(App.NL);
+			String in[] = App.readFile(file).split(About.NL);
 			for (String s : in) {
 				_db.teach(s);
 			}
