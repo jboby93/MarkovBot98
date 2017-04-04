@@ -89,7 +89,13 @@ public class MarkovDB {
 				newKey[i] = newKey[i + 1];
 			}
 			newKey[newKey.length - 1] = nextWord;
-			currentKey = Tools.join(newKey, " ");
+			currentKey = "";
+			for (int i = 0; i < newKey.length; i++) {
+				currentKey += newKey[i];
+				if (i != newKey.length - 1) {
+					currentKey += " ";
+				}
+			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			//pick a random new one
 			currentKey = (String) _data.keySet().toArray()[Tools.rand(_data.entrySet().size() - 1)];

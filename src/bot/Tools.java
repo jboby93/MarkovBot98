@@ -14,18 +14,6 @@ public class Tools {
 		return (int) (Math.random() * max);
 	}
 
-	//string join function as in PHP
-	public static String join(String r[], String d) {
-		String out = "";
-		for (int i = 0; i < r.length; i++) {
-			out += r[i];
-			if (i != r.length - 1) {
-				out += d;
-			}
-		}
-		return out;
-	}
-
 	public static String getProcessID() {
 		Integer pid = -1;
 
