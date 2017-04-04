@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import bot.App;
-import bot.Tools;
 import logging.Logger;
 
 public class MarkovDB {
@@ -59,7 +58,7 @@ public class MarkovDB {
 			Logger.error("randomize(): error; data model size is 0");
 			currentKey = null;
 		} else {
-			int start = Tools.rand(_data.entrySet().size() - 1);
+			int start = (int) Math.random() * _data.entrySet().size() - 1;
 			currentKey = (String) _data.keySet().toArray()[start];
 		}
 	} //end randomize()
@@ -81,7 +80,7 @@ public class MarkovDB {
 		}
 
 		//pick one randomly
-		String nextWord = options.get(Tools.rand(options.size() - 1));
+		String nextWord = options.get((int)Math.random() * options.size() - 1);
 
 		try {
 			String newKey[] = currentKey.split(" ");
@@ -98,7 +97,7 @@ public class MarkovDB {
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			//pick a random new one
-			currentKey = (String) _data.keySet().toArray()[Tools.rand(_data.entrySet().size() - 1)];
+			currentKey = (String) _data.keySet().toArray()[(int)Math.random()*_data.entrySet().size() - 1];
 		}
 
 		return nextWord;

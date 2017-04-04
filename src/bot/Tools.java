@@ -9,11 +9,6 @@ import logging.Logger;
 import sun.management.VMManagement;
 
 public class Tools {
-	// Random number generator -- range: [0, max)
-	public static int rand(int max) {
-		return (int) (Math.random() * max);
-	}
-
 	public static String getProcessID() {
 		Integer pid = -1;
 
