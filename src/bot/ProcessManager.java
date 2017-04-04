@@ -9,7 +9,11 @@ import logging.Logger;
 import sun.management.VMManagement;
 
 public class ProcessManager {
-	public String getProcessID() {
+	int processID = -1;
+	public int getProcessID() {
+		if (this.processID != -1){
+			return this.processID;
+		}
 		Integer pid = -1;
 
 		/*
@@ -31,7 +35,7 @@ public class ProcessManager {
 			Logger.logStackTrace(e);
 			pid = -1;
 		}
-
-		return pid.toString();
+		this.processID = pid;
+		return pid;
 	}
 }
