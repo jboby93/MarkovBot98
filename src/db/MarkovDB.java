@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import bot.App;
+import logging.About;
 import logging.Logger;
 
 public class MarkovDB {
@@ -225,7 +226,7 @@ public class MarkovDB {
 			_data.clear();
 
 		String in = App.readFile(file);
-		String lines[] = in.split(App.NL);
+		String lines[] = in.split(About.NL);
 
 		for (String s : lines) {
 			if (s.trim().isEmpty())
