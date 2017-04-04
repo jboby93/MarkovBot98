@@ -47,7 +47,7 @@ public class App {
 		reader = new Scanner(System.in);
 
 		about();
-		processID = Tools.getProcessID();
+		processID = ProcessManager.getProcessID();
 
 		try {
 			Logger.openLogFile();

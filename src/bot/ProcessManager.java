@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 import logging.Logger;
 import sun.management.VMManagement;
 
-public class Tools {
+public class ProcessManager {
 	public static String getProcessID() {
 		Integer pid = -1;
 
