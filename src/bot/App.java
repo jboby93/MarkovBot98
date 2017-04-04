@@ -20,11 +20,11 @@ public class App {
 	public static final String build_date = "5/10/2016";
 	public static final String NL = System.getProperty("line.separator");
 
-	private static MarkovBot bot; // The bot to use
-	private static String lastResult = null; // Last generated result
+	private static MarkovBot bot; 					// The bot to use
+	private static String lastResult = null; 		// Last generated result
 	private static String startTimeString = null;
 
-	private static Scanner reader; // Scanner over BufferedReader, little I/O and less exception handling
+	private static Scanner reader; 					// Scanner over BufferedReader, little I/O and less exception handling
 
 	public static String getStatus() {
 		return bot.getStatus();
