@@ -20,11 +20,11 @@ public class App {
 	public static final String build_date = "5/10/2016";
 	public static final String NL = System.getProperty("line.separator");
 
-	private static MarkovBot bot; 				// The bot to use
-	private static String lastResult = null; 	// Last generated result
+	private static MarkovBot bot; // The bot to use
+	private static String lastResult = null; // Last generated result
 	private static String startTimeString = null;
 
-	private static Scanner reader; 				// Scanner over BufferedReader, little I/O and less exception handling
+	private static Scanner reader; // Scanner over BufferedReader, little I/O and less exception handling
 
 	public static String getStatus() {
 		return bot.getStatus();
@@ -38,7 +38,6 @@ public class App {
 		about();
 		try {
 			Logger.openLogFile();
-			Logger.info(name + " - v" + version + " (" + build_date + ")");
 			Logger.debug("main(): program started on " + startTimeString);
 			Logger.debug("main(): creating bot instance");
 			bot = new MarkovBot();
@@ -417,7 +416,9 @@ public class App {
 	}
 
 	public static void about() {
-		System.out.println(name + " - v" + version + " (" + build_date + ")\n");
+		String about = name + " - v" + version + " (" + build_date + ")\n";
+		Logger.info(about);
+		System.out.println(about);
 	}
 
 	public static void writeFile(String file, String text, boolean append) {
