@@ -31,210 +31,204 @@ public class App {
 		reader = new Scanner(System.in);
 
 		about();
-		try {
-			Logger.openLogFile();
-			Logger.debug("main(): program started on " + startTimeString);
-			Logger.debug("main(): creating bot instance");
-			bot = new MarkovBot();
+		Logger.openLogFile();
+		Logger.debug("main(): program started on " + startTimeString);
+		Logger.debug("main(): creating bot instance");
+		bot = new MarkovBot();
 
-			System.out.println("[This is the open-source and non-Facebook-connected version of TextpostBot 98.]");
-			System.out.println("Like the page on FB if you want to see what happens when a crowdsourced Markov");
-			System.out.println("chain generator is given shitposting powers!");
-			System.out.println("");
+		System.out.println("[This is the open-source and non-Facebook-connected version of TextpostBot 98.]");
+		System.out.println("Like the page on FB if you want to see what happens when a crowdsourced Markov");
+		System.out.println("chain generator is given shitposting powers!");
+		System.out.println("");
 
-			System.out.println("Welcome to " + About.name + " - type 'help' for commands");
-			boolean quit = false;
-			do {
-				System.out.print("[" + getStatus() + "] > ");
+		System.out.println("Welcome to " + About.name + " - type 'help' for commands");
+		boolean quit = false;
+		do {
+			System.out.print("[" + getStatus() + "] > ");
+			System.out.flush();
+			String[] cmd = reader.nextLine().split(" "); // Do it all in one line
+
+			switch (cmd[0]) {
+			case "generate": //generate
+			case "g":
+				generatePost(cmd);
+				break;
+			case "last": //bring back the last generated output
+			case "L":
+				System.out.println("");
+				System.out.println("This is the last generated result:");
+				System.out.println(lastResult);
+				System.out.println("=======================================");
+				System.out.println("What do you want to do with this text?");
+				System.out.println(" save - save to file; anything else - nothing");
+				System.out.print("[save/[*]]: ");
 				System.out.flush();
-				String[] cmd = reader.nextLine().split(" "); // Do it all in one line
+				String ask = reader.nextLine().toLowerCase();
 
-				switch (cmd[0]) {
-				case "generate": //generate
-				case "g":
-					generatePost(cmd);
-					break;
-				case "last": //bring back the last generated output
-				case "L":
-					System.out.println("");
-					System.out.println("This is the last generated result:");
-					System.out.println(lastResult);
-					System.out.println("=======================================");
-					System.out.println("What do you want to do with this text?");
-					System.out.println(" save - save to file; anything else - nothing");
-					System.out.print("[save/[*]]: ");
-					System.out.flush();
-					String ask = reader.nextLine().toLowerCase();
-
-					switch (ask) {
-					case "save":
-						saveLastResultToFile();
-						break;
-					}
-					break;
-				case "db":
-					//get first argument
-					if (cmd.length > 1) {
-						switch (cmd[1]) {
-						case "load":
-							bot.loadDatabase();
-							break;
-						case "save":
-							bot.saveDatabase();
-							break;
-						case "search":
-						case "s":
-							//remaining arguments: search terms
-							if (cmd.length > 2) {
-								//return n-grams the terms appear in, and also list the n-grams that
-								//lead to the search terms
-								List<String> terms = new ArrayList<String>();
-								for (int t = 2; t < cmd.length; t++) {
-									terms.add(cmd[t].trim().toLowerCase());
-								}
-
-								//results should be a listing, each n-gram has an ID which is its index in the database
-								//this ID is used to perform editing operations.
-								List<DBSearchResult> results = bot.getDB().search(terms);
-								System.out.println(results.size() + " results found:");
-								for (DBSearchResult result : results) {
-									//[index] -- [key] -> [values]
-									System.out.println(result.getIndex() + " [match score " + result.getScore()
-											+ "] -- '" + result.getKey() + "' -> " + result.getValue().toString());
-								}
-							} else {
-								//missing argument(s): search term(s)
-								System.out.println("expected: search term(s)");
-							}
-							break;
-						case "edit":
-						case "e":
-							//argument: the index of the n-gram to edit
-							//looping menu: given the n-gram, list its possible outcomes
-							//get the number of an outcome to edit or delete, or add a new outcome, or cancel
-							if (cmd.length > 2) {
-
-							} else {
-								//missing argument - n-gram index
-								System.out.println("expected: n-gram index. use 'search' to find an n-gram's index");
-							}
-							break;
-						case "remove":
-						case "rm":
-							//argument: the index of the n-gram to remove
-							if (cmd.length > 2) {
-								bot.getDB().remove(Integer.parseInt(cmd[2]));
-							} else {
-								//missing argument - n-gram index
-								System.out.println("expected: n-gram index. use 'search' to find an n-gram's index");
-							}
-							break;
-						case "replace":
-						case "r":
-							//replace instances of one word with another throughout the database
-							break;
-						case "clear":
-						case "C":
-							if (confirm("Are you sure you want to empty the database?")) {
-								if (confirm("Are you REALLY sure?")) {
-									bot.getDB().clear();
-								}
-							}
-							break;
-						case "help":
-							System.out.println("usage: db [sub-command]");
-							System.out.println("file i/o:");
-							System.out.println(
-									" - load - Loads a database from a file. (can also use command macro 'dbl')");
-							System.out.println(
-									" - save - Saves a database to a file. (can also use command macro 'dbs')");
-							System.out.println("database operations:");
-							System.out.println(" - search [terms]");
-							System.out.println(
-									"   Searches the database for n-grams containing or leading to the search terms.");
-							System.out.println(
-									"   Each result is given an n-gram index that describes its location in the database.  You'll need to supply this ID to use the edit or remove commands on a particular n-gram.");
-							System.out.println(" - edit [n-gram index]");
-							System.out.println(
-									"   Allows editing of the outcomes of the n-gram at the specified index within the database, including creation and deletion.");
-							System.out.println(" - remove [n-gram index]");
-							System.out.println(
-									"   Removes an n-gram and all of its associated outcomes from the database.  This can impact generation results.");
-							System.out.println(" - clear - Clears all data from the database.");
-							break;
-						}
-					} else {
-						//missing argument: db
-						//print list of subcommands
-						System.out.println(
-								"db: missing argument - expected load, save, search, edit, remove, clear, or help");
-					}
-					break;
-				case "dbl": //load database
-					if (cmd.length > 1) {
-						bot.loadDatabaseFrom(cmd[1]);
-					} else {
-						bot.loadDatabase();
-					}
-					break;
-				case "dbs": //save database
-					if (cmd.length > 1) {
-						bot.saveDatabaseTo(cmd[1]);
-					} else {
-						bot.saveDatabase();
-					}
-					break;
-				case "read": //read and learn from file
-				case "r":
-					learnFromFile(cmd);
-					break;
-				case "teach": //learn from stdin, or filename if provided
-				case "t":
-					learnFromConsole(cmd);
-					break;
-				case "quit": //quit
-				case "q":
-					quit = true;
-					break;
-				case "debug":
-					if (cmd.length == 1) {
-						//missing arg
-						System.out.println("expected debug command");
-					} else {
-						switch (cmd[1]) {
-						case "time":
-							Logger.debug("getUNIXTimestamp() returned " + dateTime.getUNIXTimestamp());
-							break;
-						default:
-							System.out.println("Invalid debug command");
-						}
-					}
-					break;
-				case "help":
-					System.out.println("Available commands:");
-					System.out.println(" generate, g - generate a shitpost");
-					System.out.println("               add \"from [file]\" to use a file as input text");
-					System.out.println("          db - database commands");
-					System.out.println("         dbl - load database");
-					System.out.println("         dbs - save database");
-					System.out.println("     read, r - read and learn from file");
-					System.out.println("    teach, t - teach the bot from stdin");
-					System.out.println("     quit, q - quit");
-					break;
-				default:
-					System.out.println("unrecognized command: " + cmd[0]);
+				switch (ask) {
+				case "save":
+					saveLastResultToFile();
 					break;
 				}
-			} while (!quit);
-		} catch (Exception e) {
-			panic(e);
-		}
+				break;
+			case "db":
+				//get first argument
+				if (cmd.length > 1) {
+					switch (cmd[1]) {
+					case "load":
+						bot.loadDatabase();
+						break;
+					case "save":
+						bot.saveDatabase();
+						break;
+					case "search":
+					case "s":
+						//remaining arguments: search terms
+						if (cmd.length > 2) {
+							//return n-grams the terms appear in, and also list the n-grams that
+							//lead to the search terms
+							List<String> terms = new ArrayList<String>();
+							for (int t = 2; t < cmd.length; t++) {
+								terms.add(cmd[t].trim().toLowerCase());
+							}
 
+							//results should be a listing, each n-gram has an ID which is its index in the database
+							//this ID is used to perform editing operations.
+							List<DBSearchResult> results = bot.getDB().search(terms);
+							System.out.println(results.size() + " results found:");
+							for (DBSearchResult result : results) {
+								//[index] -- [key] -> [values]
+								System.out.println(result.getIndex() + " [match score " + result.getScore() + "] -- '"
+										+ result.getKey() + "' -> " + result.getValue().toString());
+							}
+						} else {
+							//missing argument(s): search term(s)
+							System.out.println("expected: search term(s)");
+						}
+						break;
+					case "edit":
+					case "e":
+						//argument: the index of the n-gram to edit
+						//looping menu: given the n-gram, list its possible outcomes
+						//get the number of an outcome to edit or delete, or add a new outcome, or cancel
+						if (cmd.length > 2) {
+
+						} else {
+							//missing argument - n-gram index
+							System.out.println("expected: n-gram index. use 'search' to find an n-gram's index");
+						}
+						break;
+					case "remove":
+					case "rm":
+						//argument: the index of the n-gram to remove
+						if (cmd.length > 2) {
+							bot.getDB().remove(Integer.parseInt(cmd[2]));
+						} else {
+							//missing argument - n-gram index
+							System.out.println("expected: n-gram index. use 'search' to find an n-gram's index");
+						}
+						break;
+					case "replace":
+					case "r":
+						//replace instances of one word with another throughout the database
+						break;
+					case "clear":
+					case "C":
+						if (confirm("Are you sure you want to empty the database?")) {
+							if (confirm("Are you REALLY sure?")) {
+								bot.getDB().clear();
+							}
+						}
+						break;
+					case "help":
+						System.out.println("usage: db [sub-command]");
+						System.out.println("file i/o:");
+						System.out
+								.println(" - load - Loads a database from a file. (can also use command macro 'dbl')");
+						System.out.println(" - save - Saves a database to a file. (can also use command macro 'dbs')");
+						System.out.println("database operations:");
+						System.out.println(" - search [terms]");
+						System.out.println(
+								"   Searches the database for n-grams containing or leading to the search terms.");
+						System.out.println(
+								"   Each result is given an n-gram index that describes its location in the database.  You'll need to supply this ID to use the edit or remove commands on a particular n-gram.");
+						System.out.println(" - edit [n-gram index]");
+						System.out.println(
+								"   Allows editing of the outcomes of the n-gram at the specified index within the database, including creation and deletion.");
+						System.out.println(" - remove [n-gram index]");
+						System.out.println(
+								"   Removes an n-gram and all of its associated outcomes from the database.  This can impact generation results.");
+						System.out.println(" - clear - Clears all data from the database.");
+						break;
+					}
+				} else {
+					//missing argument: db
+					//print list of subcommands
+					System.out.println(
+							"db: missing argument - expected load, save, search, edit, remove, clear, or help");
+				}
+				break;
+			case "dbl": //load database
+				if (cmd.length > 1) {
+					bot.loadDatabaseFrom(cmd[1]);
+				} else {
+					bot.loadDatabase();
+				}
+				break;
+			case "dbs": //save database
+				if (cmd.length > 1) {
+					bot.saveDatabaseTo(cmd[1]);
+				} else {
+					bot.saveDatabase();
+				}
+				break;
+			case "read": //read and learn from file
+			case "r":
+				learnFromFile(cmd);
+				break;
+			case "teach": //learn from stdin, or filename if provided
+			case "t":
+				learnFromConsole(cmd);
+				break;
+			case "quit": //quit
+			case "q":
+				quit = true;
+				break;
+			case "debug":
+				if (cmd.length == 1) {
+					//missing arg
+					System.out.println("expected debug command");
+				} else {
+					switch (cmd[1]) {
+					case "time":
+						Logger.debug("getUNIXTimestamp() returned " + dateTime.getUNIXTimestamp());
+						break;
+					default:
+						System.out.println("Invalid debug command");
+					}
+				}
+				break;
+			case "help":
+				System.out.println("Available commands:");
+				System.out.println(" generate, g - generate a shitpost");
+				System.out.println("               add \"from [file]\" to use a file as input text");
+				System.out.println("          db - database commands");
+				System.out.println("         dbl - load database");
+				System.out.println("         dbs - save database");
+				System.out.println("     read, r - read and learn from file");
+				System.out.println("    teach, t - teach the bot from stdin");
+				System.out.println("     quit, q - quit");
+				break;
+			default:
+				System.out.println("unrecognized command: " + cmd[0]);
+				break;
+			}
+		} while (!quit);
 		Logger.debug("main(): exiting");
 		Logger.closeLogFile();
 	}
 
-	public static void generatePost(String args[]) throws IOException {
+	public static void generatePost(String args[]) {
 		//arg: (optional) word count
 		int wordCount = 100;
 		boolean fromFile = false;
