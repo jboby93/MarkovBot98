@@ -321,7 +321,7 @@ public class App {
 		}
 
 		System.out.println("Done.");
-	} //end generatePost()
+	}
 
 	public static void learnFromFile(String args[]) {
 		String file = null;
@@ -340,7 +340,6 @@ public class App {
 	}
 
 	public static void learnFromConsole(String args[]) {
-
 		String cancel = "#cancel";
 		boolean done = false;
 
