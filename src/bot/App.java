@@ -379,12 +379,6 @@ public class App {
 		}
 	}
 
-	// On process crash, halt all threads
-	private static void panic(Exception e) {
-		Logger.error("panic(): panic handler invoked on exception -- the program will stop");
-		Logger.logStackTrace(e);
-	}
-
 	public static String readFile(String file) throws IOException {
 		BufferedReader fileReader = new BufferedReader(new FileReader(file));
 
