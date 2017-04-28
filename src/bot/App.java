@@ -1,35 +1,33 @@
 package bot;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import db.DBSearchResult;
+import db.FileOperations;
 import logging.About;
 import logging.Logger;
 import time.DateTime;
 
 public class App {
-	private static MarkovBot bot; 					// The bot to use
-	private static String lastResult = null; 		// Last generated result
-	private static String startTimeString = null;
+	private MarkovBot bot; 					// The bot to use
+	private String lastResult; 		// Last generated result
+	private String startTimeString;
 
-	private static Scanner reader; 					// Scanner over BufferedReader, little I/O and less exception handling
+	private Scanner reader; 					// Scanner over BufferedReader, little I/O and less exception handling
 
-	public static String getStatus() {
-		return bot.getStatus();
+	public App(){
+		this.bot = new MarkovBot();
+		this.lastResult = null;
+		this.startTimeString = new DateTime().getDateString();
+		this.reader = new Scanner(System.in);
 	}
-
-	public static void main(String args[]) {
-		DateTime dateTime = new DateTime();
-		startTimeString = dateTime.getDateString();
-		reader = new Scanner(System.in);
-
+	
+	public void start() {
 		about();
 		Logger.openLogFile();
 		Logger.debug("main(): program started on " + startTimeString);
@@ -201,7 +199,7 @@ public class App {
 				} else {
 					switch (cmd[1]) {
 					case "time":
-						Logger.debug("getUNIXTimestamp() returned " + dateTime.getUNIXTimestamp());
+						Logger.debug("getUNIXTimestamp() returned " + new DateTime().getUNIXTimestamp());
 						break;
 					default:
 						System.out.println("Invalid debug command");
@@ -228,7 +226,7 @@ public class App {
 		Logger.closeLogFile();
 	}
 
-	public static void generatePost(String args[]) {
+	public void generatePost(String args[]) {
 		//arg: (optional) word count
 		int wordCount = 100;
 		boolean fromFile = false;
@@ -323,7 +321,7 @@ public class App {
 		System.out.println("Done.");
 	}
 
-	public static void learnFromFile(String args[]) {
+	public void learnFromFile(String args[]) {
 		String file = null;
 		if (args.length == 1) {
 			System.out.print("Learn from file [or #cancel to cancel]: ");
@@ -339,7 +337,7 @@ public class App {
 		}
 	}
 
-	public static void learnFromConsole(String args[]) {
+	public void learnFromConsole(String args[]) {
 		String cancel = "#cancel";
 		boolean done = false;
 
@@ -363,7 +361,7 @@ public class App {
 		System.out.println("Added " + (after - before) + " new entries to the bot's database");
 	}
 
-	public static void saveLastResultToFile() {
+	public void saveLastResultToFile() {
 		System.out.println("Enter a filename or '#cancel' to cancel.");
 		System.out.print("Save as: ");
 		System.out.flush();
@@ -373,7 +371,7 @@ public class App {
 		if (file.equals("#cancel")) {
 			System.out.println("Operation cancelled.");
 		} else {
-			writeFile(file, lastResult, false);
+			FileOperations.writeFile(file, this.lastResult, false);
 			System.out.println("File saved successfully!");
 		}
 	}
@@ -390,33 +388,20 @@ public class App {
 		return out;
 	}
 
-	public static boolean confirm(String prompt) {
+	public boolean confirm(String prompt) {
 		System.out.print(prompt + " [y/n]");
 		System.out.flush();
 		String response = reader.nextLine();
 		return (response.toLowerCase().charAt(0) == 'y');
 	}
 
-	public static void about() {
+	public void about() {
 		String about = About.name + " - v" + About.version + " (" + About.build_date + ")\n";
 		Logger.info(about);
 		System.out.println(about);
 	}
 
-	public static void writeFile(String file, String text, boolean append) {
-		BufferedWriter fileWriter = null;
-		try {
-			fileWriter = new BufferedWriter(new FileWriter(file, append));
-		} catch (IOException e) {
-			Logger.error("Could not find file: " + file);
-			Logger.logStackTrace(e);
-		}
-
-		try {
-			fileWriter.write(text);
-			fileWriter.close(); // Close calls flush
-		} catch (IOException e1) {
-			Logger.logStackTrace(e1);
-		}
+	public String getStatus() {
+		return bot.getStatus();
 	}
 }
