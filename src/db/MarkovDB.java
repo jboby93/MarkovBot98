@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import bot.App;
 import logging.About;
@@ -59,7 +60,7 @@ public class MarkovDB {
 			Logger.error("randomize(): error; data model size is 0");
 			currentKey = null;
 		} else {
-			int start = (int) Math.random() * _data.entrySet().size() - 1;
+			int start = new Random().nextInt(_data.entrySet().size());
 			currentKey = (String) _data.keySet().toArray()[start];
 		}
 	} //end randomize()
@@ -81,7 +82,7 @@ public class MarkovDB {
 		}
 
 		//pick one randomly
-		String nextWord = options.get((int) Math.random() * options.size() - 1);
+		String nextWord = options.get(new Random().nextInt(options.size()));
 
 		try {
 			String newKey[] = currentKey.split(" ");
